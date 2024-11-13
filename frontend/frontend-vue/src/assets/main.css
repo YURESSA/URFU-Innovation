@@ -1,0 +1,18 @@
+@import url('./base.css');
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  font-weight: normal;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: rgb(80, 188, 190);
+  background: linear-gradient(30deg, rgba(80, 188, 190, 1) 0%, rgba(164, 215, 215, 1) 75%, rgba(236, 237, 237, 1) 100%);
+}
