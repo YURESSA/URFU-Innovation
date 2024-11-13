@@ -1,0 +1,62 @@
+@font-face {
+  font-family: 'INNOURFU';
+  src: url('/fonts/URFU.TTF');
+}
+
+@font-face {
+  font-family: 'PF Bulletin Sans Pro';
+  src: url('/public/fonts/PFBulletinSansPro-Black.ttf');
+}
+
+:root {
+  --font-family: 'PF Bulletin Sans Pro', sans-serif;
+  --second-family: 'INNOURFU', sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  color: #2b2a28;
+  font-size: 16px;
+}
+
+a{
+  text-decoration: none;
+}
+
+h1 {
+  font-family: var(--second-family);
+  font-weight: 400;
+  font-size: 150px;
+  line-height: 100%;
+  text-transform: uppercase;
+  color: #2b2a28;
+  margin: 0;
+  height: max-content;
+}
+
+h2 {
+  font-family: var(--second-family);
+  font-weight: 400;
+  font-size: 64px;
+  line-height: 100%;
+  text-transform: uppercase;
+  color: #2b2a28;
+  margin: 0;
+}
+
+h3{
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 100%;
+  text-transform: uppercase;
+  color: #2b2a28;
+  margin: 0;
+}
+
+span{
+  font-family: var(--font-family);
+  font-weight: 500;
+    font-size: 21px;
+  color: #2b2a28;
+}
