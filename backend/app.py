@@ -1,23 +1,24 @@
 from flask import Flask, request, jsonify, session
+from flask_cors import CORS
 
 from controllers.AdminManager import AdminManager
+from controllers.DatabaseController import DatabaseController
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:5173"])
 app.secret_key = 'URFU-INNOVATE-2024'
 admin_manager = AdminManager()
 user_manager = UserManager()
+db_controller = DatabaseController()
 
 
 @app.route('/api/register-user', methods=['POST'])
 def register_user():
-    """Обработка регистрации нового пользователя"""
     data = request.form
     full_name = data.get('full_name')
     phone_number = data.get('phone_number')
     telegram_id = data.get('telegram_id')
-
-    # Проверка, что все поля заполнены
     if not all([full_name, phone_number, telegram_id]):
         return jsonify({"success": False, "message": "Необходимо заполнить все поля"}), 400
 
@@ -28,7 +29,7 @@ def register_user():
     return jsonify({"success": is_success, "message": 'Форма успешно принята'}), code
 
 
-@app.route('/api/get_test_results', methods=['POST'])
+@app.route('/api/get-test-results', methods=['GET'])
 def get_test_results():
     data = request.form
     telegram_id = data.get('telegram_id')
@@ -66,6 +67,16 @@ def logout_user():
     return jsonify({"success": True, "message": 'Вы успешно вышли'}), 200
 
 
+@app.route('/api/get-all-test', methods=['GET'])
+def get_all_test():
+    tests = db_controller.get_tests()
+    corr_tests = []
+    for test in tests:
+        corr_test = {'test_title': test[0], 'test_url': test[1]}
+        corr_tests.append(corr_test)
+    return jsonify(corr_tests)
+
+
 def get_top_sections(section_data):
     sorted_sections = sorted(section_data.items(), key=lambda x: x[1], reverse=True)
     top_values = [sorted_sections[0][1], sorted_sections[1][1], sorted_sections[2][1]]
@@ -76,23 +87,16 @@ def get_top_sections(section_data):
         return [sorted_sections[0][0], sorted_sections[1][0], sorted_sections[2][0]]
 
 
-def convert_sections_to_roles(section_names):
-    section_role = {'section1': 'Формальный лидер',
-                    'section2': 'Неформальный лидер',
-                    'section3': 'Генератор идей',
-                    'section4': 'Критик',
-                    'section5': 'Организатор работ',
-                    'section6': 'Организатор группы',
-                    'section7': 'Разведчик',
-                    'section8': 'Контролер'
-                    }
-    roles = [section_role.get(section) for section in section_names if section in section_role]
-    return roles
-
-
-@app.route('/api/belbin_test', methods=['POST'])
+@app.route('/api/belbin-test', methods=['GET', 'POST'])
 def processing_form():
-    data = request.form
+    if request.method == 'POST':
+        return process_post_request()
+
+    if request.method == 'GET':
+        return get_questions()
+
+
+def process_post_request():
     telegram_id = session.get('telegram_id')
     if not telegram_id:
         return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
@@ -101,15 +105,76 @@ def processing_form():
     test_id = 1
     user_test_id = user_manager.add_test_to_user(user_id, test_id)
 
-    section_data = {}
-    for key in list(data):
-        section_data[key] = round(int(data[key]) / 70 * 100)
-    print(section_data)
-    top_sections = get_top_sections(section_data)
-    roles = convert_sections_to_roles(top_sections)
-    user_manager.save_user_answers(user_test_id, section_data)
+    data = {key: int(value) for key, value in request.form.items()}
+    result = calculate_section_scores(data)
+
+    roles_data = db_controller.get_roles_and_descriptions()
+    data_percentages = calculate_percentages(result)
+
+    final_data = get_top_two_sections(data_percentages)
+    final_result = build_final_result(final_data, roles_data)
+
+    db_controller.save_user_answers(user_test_id, data_percentages)
+    data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
+
     logout_user()
-    return jsonify({"success": True, "message": "Форма успешно принята", "roles": roles}), 200
+
+    return jsonify({
+        "success": True,
+        "message": "Форма успешно принята",
+        "prefer_roles": final_result,
+        "all_roles": data_roles
+    }), 200
+
+
+def get_questions():
+    questions = db_controller.get_all_questions()
+    return jsonify({"success": True, "questions": questions}), 200
+
+
+def calculate_section_scores(data):
+    return {
+        'section1': data.get('3section1') + data.get('2section2') + data.get('6section3') + data.get('1section4') +
+                    data.get('5section6') + data.get('7section7') + data.get('4section8'),
+        'section2': data.get('7section1') + data.get('4section2') + data.get('3section3') + data.get('5section4') +
+                    data.get('2section5') + data.get('1section6') + data.get('6section7'),
+        'section3': data.get('6section1') + data.get('1section3') + data.get('3section4') + data.get('4section5') +
+                    data.get('7section6') + data.get('2section7') + data.get('5section8'),
+        'section4': data.get('5section1') + data.get('7section2') + data.get('4section3') + data.get('2section4') +
+                    data.get('6section5') + data.get('3section7') + data.get('1section8'),
+        'section5': data.get('2section1') + data.get('5section2') + data.get('4section4') + data.get('7section5') +
+                    data.get('6section6') + data.get('1section7') + data.get('3section8'),
+        'section6': data.get('4section1') + data.get('1section2') + data.get('6section2') + data.get('5section3') +
+                    data.get('3section5') + data.get('2section6') + data.get('7section8'),
+        'section7': data.get('1section1') + data.get('2section3') + data.get('7section4') + data.get('5section5') +
+                    data.get('3section6') + data.get('4section7') + data.get('6section8'),
+        'section8': data.get('3section2') + data.get('7section3') + data.get('6section4') + data.get('1section5') +
+                    data.get('4section6') + data.get('5section7') + data.get('2section8'),
+    }
+
+
+def calculate_percentages(result):
+    total_sum = sum(result.values())
+    return {key: round((value / total_sum) * 100) for key, value in result.items()}
+
+
+def get_top_two_sections(data_percentages):
+    sorted_values = sorted(set(data_percentages.values()), reverse=True)[:2]
+    top_two_values = set(sorted_values)
+    return {key: value for key, value in data_percentages.items() if value in top_two_values}
+
+
+def build_final_result(final_data, roles_data):
+    final_result = []
+    for section, value in final_data.items():
+        role_info = roles_data.get(section)
+        if role_info:
+            final_result.append({
+                'role': role_info['role_in_team'],
+                'value': value,
+                'description': role_info['description']
+            })
+    return final_result
 
 
 @app.route('/api/login', methods=['POST'])
@@ -124,7 +189,7 @@ def login():
     return jsonify({"success": is_success, "message": message}), 200
 
 
-@app.route('/api/change_password', methods=['POST'])
+@app.route('/api/change-password', methods=['POST'])
 def change_password():
     data = request.form
     username = session.get('username')
@@ -146,7 +211,7 @@ def logout():
     return jsonify({"success": True, "message": 'Вы успешно вышли'}), 200
 
 
-@app.route('/api/delete_admin', methods=['DELETE'])
+@app.route('/api/delete-admin', methods=['DELETE'])
 def delete_admin():
     data = request.form
     username = data.get('username')
@@ -167,7 +232,7 @@ def get_all_admins():
     return jsonify({"success": True, "admins": result}), 200
 
 
-@app.route('/api/promote_to_super_admin', methods=['POST'])
+@app.route('/api/promote-to-super-admin', methods=['POST'])
 def promote_to_super_admin():
     current_user = session.get('username')
     if not current_user:

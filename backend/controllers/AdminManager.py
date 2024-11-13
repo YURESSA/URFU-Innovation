@@ -77,7 +77,6 @@ class AdminManager:
             return result and result[0] == 'super_admin'
 
     def is_admin(self, username):
-        """Проверка, является ли пользователь администратором"""
         with self.get_connection() as connection:
             cursor = connection.cursor()
             cursor.execute("SELECT role FROM admins WHERE username = ?", (username,))

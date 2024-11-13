@@ -3,9 +3,9 @@
     <div class="form">
       <h3>Заполните данные</h3>
       <form ref="studentForm" method="post" @submit="handleSubmit">
-        <input type="text" name="name" placeholder="ФИО" required >
-        <input type="tel" name="number" placeholder="Номер телефона" required >
-        <input type="text" name="telegram" placeholder="Телеграмм" required >
+        <input type="text" name="full_name" placeholder="ФИО" required >
+        <input type="tel" name="phone_number" placeholder="Номер телефона" required >
+        <input type="text" name="telegram_id" placeholder="Телеграмм" required >
         <button ref="sumbitButton" type="submit"><span>Перейти к тесту</span></button>
       </form>
     </div>
@@ -25,7 +25,7 @@ function handleSubmit(event) {
   const formData = new FormData(studentForm.value);
   sumbitButton.value.disabled = true;
   
-  axios.post('https://29.javascript.htmlacademy.pro/kekstagram', formData)
+  axios.post('http://127.0.0.1:5000/api/register-user', formData)
     .then(response => {
       console.log('Данные успешно отправлены!');
     })
