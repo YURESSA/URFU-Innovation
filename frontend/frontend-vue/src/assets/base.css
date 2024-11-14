@@ -5,7 +5,7 @@
 
 @font-face {
   font-family: 'PF Bulletin Sans Pro';
-  src: url('/public/fonts/PFBulletinSansPro-Black.ttf');
+  src: url('/public/fonts/PFBulletinSansPro-Regular.ttf');
 }
 
 :root {
@@ -54,9 +54,25 @@ h3{
   margin: 0;
 }
 
+h4{
+  font-family: var(--second-family);
+  font-weight: 400;
+  font-size: 38px;
+  text-transform: uppercase;
+  color: #2b2a28;
+  margin: 0;
+}
+
 span{
   font-family: var(--font-family);
   font-weight: 500;
-    font-size: 21px;
+  font-size: 21px;
+  color: #2b2a28;
+}
+
+p{
+  font-family: var(--font-family);
+  font-weight: 200;
+  font-size: 16px;
   color: #2b2a28;
 }
