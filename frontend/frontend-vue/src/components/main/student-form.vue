@@ -33,7 +33,6 @@ function handleSubmit(event) {
   axios.post('http://127.0.0.1:5000/api/register-user', formData)
     .then(response => {
       console.log('Данные успешно отправлены!');
-      store.fetchBelbin();
       router.push(props.testUrl);
     })
     .catch(error => {

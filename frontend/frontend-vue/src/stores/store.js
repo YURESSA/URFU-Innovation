@@ -19,6 +19,8 @@ export const useDataStore = defineStore('data', {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/api/belbin-test'); // получаю вопросы теста
                 this.belbin = response.data;
+                console.log('Данные загрузил', this.belbin)
+                console.log(response.data)
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }

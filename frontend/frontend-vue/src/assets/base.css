@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'INNOURFU';
-  src: url('/fonts/URFU.TTF');
+  src: url('/dist/fonts/URFU.TTF');
 }
 
 @font-face {
   font-family: 'PF Bulletin Sans Pro';
-  src: url('/public/fonts/PFBulletinSansPro-Regular.ttf');
+  src: url('/dist/fonts/PFBulletinSansPro-Regular.ttf');
 }
 
 :root {
@@ -17,6 +17,7 @@ body {
   min-height: 100vh;
   color: #2b2a28;
   font-size: 16px;
+  overflow-x: hidden;
 }
 
 a{
@@ -59,6 +60,14 @@ h4{
   font-weight: 400;
   font-size: 38px;
   text-transform: uppercase;
+  color: #2b2a28;
+  margin: 0;
+}
+
+h5{
+  font-family: var(--font-family);
+  font-weight: 900;
+  font-size: 29px;
   color: #2b2a28;
   margin: 0;
 }

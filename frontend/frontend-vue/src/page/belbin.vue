@@ -1,20 +1,27 @@
 <template>
-  <div class="page__wrapper">
+  <div class="page__wrapper" v-if="isLoading">
     <chapter-one-header></chapter-one-header>
-    <charapter-one-main class="main"></charapter-one-main>
+    <charapter-one-main class="main" :test="test"></charapter-one-main>
+  </div>
+  <div v-else>
+    Загрузка...
   </div>
 </template>
 
 <script setup>
 import { useDataStore } from '@/stores/store.js';
-import {computed} from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import ChapterOneHeader from '@/components/belbin/chapter-one-header.vue';
 import CharapterOneMain from '@/components/belbin/charapter-one-main.vue';
 
 const store = useDataStore();
+const isLoading = ref(false);
 
-const questions = computed(() => store.getBelbin);
-console.log(questions.value.all_roles)
+onMounted(async () => {
+  await store.fetchBelbin();
+  isLoading.value = true;
+});
+const test = computed(() => store.getBelbin);
 </script>
 
 <style scoped>
@@ -25,6 +32,6 @@ console.log(questions.value.all_roles)
 }
 
 .main{
-  margin-top: 40px;
+  padding: 40px 0;
 }
 </style>

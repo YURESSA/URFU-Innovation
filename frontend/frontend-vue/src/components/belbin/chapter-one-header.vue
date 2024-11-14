@@ -10,8 +10,6 @@
         <img src="/src/assets/belbin/line2.svg" class="line2" alt="">
       </div>
     </div>
-  </header>
-  <main>
     <div class="description">
       <h4 class="slogan">определи свою роль в команде</h4>
       <p>В каждой из семи частей данного теста распределите <b>10</b> баллов между <b>8</b> утверждениями. <br>
@@ -19,7 +17,7 @@
       <p>Рекомендуем распределять баллы <b>5/3/2</b> для достоверности результата.
         По результатам прохождения теста будет определена <b>ваша роль</b> в команде.</p>
     </div>
-  </main>
+  </header>
 </template>
 
 <script setup>
@@ -34,8 +32,14 @@
   padding-top: 45px;
 }
 
+header{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .title{
-  width: 400px;
+  width: 40%;
 }
 
 .logo{
@@ -70,7 +74,8 @@ main{
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  width: 700px;
+  width: 50%;
+  margin-top: 20px;
 }
 
 .slogan{
