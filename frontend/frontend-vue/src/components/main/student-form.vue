@@ -15,19 +15,26 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+import { useDataStore } from '@/stores/store.js';
 
+const store = useDataStore();
+const router = useRouter();
 const studentForm = ref(null);
 const sumbitButton = ref(null);
 
+const props = defineProps(['testUrl']);
+
 function handleSubmit(event) {
   event.preventDefault();
-  console.log('fasdasdasd');
   const formData = new FormData(studentForm.value);
   sumbitButton.value.disabled = true;
   
-  axios.post('https://29.javascript.htmlacademy.pro/kekstagram', formData)
+  axios.post('http://127.0.0.1:5000/api/register-user', formData)
     .then(response => {
       console.log('Данные успешно отправлены!');
+      store.fetchBelbin();
+      router.push(props.testUrl);
     })
     .catch(error => {
       console.error('Произошла ошибка:', error);

@@ -1,7 +1,7 @@
 <template>
   <div class="test">
     <h2>{{ title }}</h2>
-    <img src="../assets/main-page/star.svg" class="star" alt="Star" />
+    <img src="/src/assets/main-page/star.svg" class="star" alt="Star" />
   </div>
 </template>
 
