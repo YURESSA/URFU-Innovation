@@ -6,7 +6,7 @@ from controllers.DatabaseController import DatabaseController
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, resources={r'/*': {'origins': '*'}}, supports_credentials=True)
 app.secret_key = 'URFU-INNOVATE-2024'
 admin_manager = AdminManager()
 user_manager = UserManager()
@@ -26,7 +26,7 @@ def register_user():
     session['telegram_id'] = telegram_id
     code = 201
 
-    return jsonify({"success": is_success, "message": 'Форма успешно принята'}), code
+    return jsonify({"telegram_id": telegram_id, "success": is_success, "message": 'Форма успешно принята'}), code
 
 
 @app.route('/api/get-test-results', methods=['GET'])
@@ -97,7 +97,10 @@ def processing_form():
 
 
 def process_post_request():
-    telegram_id = session.get('telegram_id')
+    data = request.json
+    telegram_id = list(data.keys())[0]
+    data = data.get(telegram_id)
+    print(telegram_id)
     if not telegram_id:
         return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
 
@@ -105,7 +108,8 @@ def process_post_request():
     test_id = 1
     user_test_id = user_manager.add_test_to_user(user_id, test_id)
 
-    data = {key: int(value) for key, value in request.form.items()}
+    data = {key: int(value) for key, value in data.items()}
+    print(data)
     result = calculate_section_scores(data)
 
     roles_data = db_controller.get_roles_and_descriptions()
@@ -116,6 +120,8 @@ def process_post_request():
 
     db_controller.save_user_answers(user_test_id, data_percentages)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
+
+    logout_user()
 
     return jsonify({
         "success": True,

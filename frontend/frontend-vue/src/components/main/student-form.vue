@@ -15,6 +15,7 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { useRouter } from 'vue-router';
 import { useDataStore } from '@/stores/store.js';
 
@@ -33,6 +34,11 @@ function handleSubmit(event) {
   axios.post('http://127.0.0.1:5000/api/register-user', formData)
     .then(response => {
       console.log('Данные успешно отправлены!');
+
+      const sessionId = response.data.telegram_id;
+      if (sessionId) {
+        Cookies.set('session', sessionId, { expires: 7 }); // Сохраняем сессию на 7 дней
+      }
       router.push(props.testUrl);
     })
     .catch(error => {

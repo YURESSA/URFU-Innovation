@@ -17,11 +17,18 @@
       <p>Рекомендуем распределять баллы <b>5/3/2</b> для достоверности результата.
         По результатам прохождения теста будет определена <b>ваша роль</b> в команде.</p>
     </div>
+    <div class="charapter">
+      <h4><span>{{ charapter }}</span> раздел из 7</h4>
+    </div>
   </header>
 </template>
 
 <script setup>
+import { defineProps } from 'vue';
 
+const props = defineProps({
+  charapter: Number
+});
 </script>
 
 <style scoped>
@@ -75,10 +82,22 @@ main{
   flex-direction: column;
   align-items: flex-start;
   width: 50%;
-  margin-top: 20px;
+  margin: 30px 0;
 }
 
 .slogan{
+  color: #57c0cf;
+}
+
+.charapter{
+  margin-bottom: 30px;
+  width: 50%;
+}
+
+span{
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
   color: #57c0cf;
 }
 </style>
