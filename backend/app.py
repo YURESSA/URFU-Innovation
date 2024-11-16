@@ -6,8 +6,14 @@ from controllers.DatabaseController import DatabaseController
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"])
+CORS(
+    app,
+    resources={r"/*": {"origins": "http://localhost:5174"}},
+    supports_credentials=True
+)
 app.secret_key = 'URFU-INNOVATE-2024'
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = False
 admin_manager = AdminManager()
 user_manager = UserManager()
 db_controller = DatabaseController()
@@ -105,7 +111,7 @@ def process_post_request():
     test_id = 1
     user_test_id = user_manager.add_test_to_user(user_id, test_id)
 
-    data = {key: int(value) for key, value in request.form.items()}
+    data = {key: int(value) for key, value in request.json.items()}
     result = calculate_section_scores(data)
 
     roles_data = db_controller.get_roles_and_descriptions()
