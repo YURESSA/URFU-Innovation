@@ -1,30 +1,27 @@
+import json
 import sqlite3
 
 
-class DatabaseController:
-    def __init__(self, db_name='data/innovate.db3'):
+class TestManager:
+    def __init__(self, db_name='data/innovate.db3', belbin_test='data/belbin/belbin.json'):
         self.db_name = db_name
+        self.belbin_test = belbin_test
 
     def get_connection(self):
         return sqlite3.connect(self.db_name)
 
     def get_all_questions(self):
-        with self.get_connection() as connection:
-            cursor = connection.cursor()
-            cursor.execute('''
-            SELECT b.block_name, q.question_text
-            FROM belbin_question_blocks b
-            JOIN belbin_question q ON q.block_id = b.block_id
-            ''')
-            results = cursor.fetchall()
+        with open(self.belbin_test, 'r', encoding='utf-8') as file:
+            data = json.load(file)
 
         questions = []
-        for block_name, question_text in results:
-            block = next((item for item in questions if item['block_name'] == block_name), None)
-            if block is None:
-                block = {'block_name': block_name, 'questions': []}
-                questions.append(block)
-            block['questions'].append(question_text)
+        for block in data.get("questions", []):
+            block_name = block.get("block_name")
+            block_questions = block.get("questions", [])
+            questions.append({
+                "block_name": block_name,
+                "questions": block_questions
+            })
 
         return questions
 
@@ -37,13 +34,17 @@ class DatabaseController:
 
     def get_roles_and_descriptions(self):
         roles = {}
-        with self.get_connection() as connection:
-            cursor = connection.cursor()
-            cursor.execute('''SELECT section_name, role_in_team, description FROM roles_table''')
-            rows = cursor.fetchall()
-            for row in rows:
-                section_name, role_in_team, description = row
-                roles[section_name] = {'role_in_team': role_in_team, 'description': description}
+        with open(self.belbin_test, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        roles = {}
+        for role in data.get("roles", []):
+            section_name = role.get("section_name")
+            roles[section_name] = {
+                "role_in_team": role.get("role_in_team"),
+                "description": role.get("description")
+            }
+
         return roles
 
     def save_user_answers(self, user_test_id, data_percentages):
