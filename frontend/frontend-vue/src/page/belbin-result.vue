@@ -1,29 +1,25 @@
 <template>
-  <div class="page__wrapper" v-if="isLoading">
+  <div class="page__wrapper">
     <header-result></header-result>
-    <!-- <diagram></diagram> -->
-  </div>
-  <div v-else>
-    Загрузка...
+    <diagram :result="diagresult"></diagram>
+    <output-result :data="result.prefer_roles"></output-result>
   </div>
 </template>
 
 <script setup>
 import { useDataStore } from '@/stores/store.js';
-import { computed, ref, onMounted } from 'vue';
+import { computed } from 'vue';
 import HeaderResult from '@/components/belbin-result/header-result.vue';
-// import Diagram from '@/components/belbin-result/diagram.vue';
+import Diagram from '@/components/belbin-result/diagram.vue';
+import OutputResult from '@/components/belbin-result/output-result.vue';
 
 const store = useDataStore();
-const isLoading = ref(false);
-
-onMounted(async () => {
-  await store.fetchBelbinResult();
-  isLoading.value = true;
-});
-
 const result = computed(() => store.getBelbinResult);
-console.log(result.value[0])
+
+const diagresult = Object.entries(result.value.all_roles).map(([key, value]) => ({
+      name: key,
+      pl: value
+    }))
 </script>
 
 <style scoped>
@@ -32,5 +28,7 @@ console.log(result.value[0])
   width: 100vw;
   background-color: #eee5e5;
   padding-bottom: 50px;
+  display: flex;
+  flex-direction: column;
 }
 </style>

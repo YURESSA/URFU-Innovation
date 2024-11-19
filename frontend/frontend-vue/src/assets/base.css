@@ -59,13 +59,28 @@ h4{
   font-family: var(--second-family);
   font-weight: 400;
   font-size: 38px;
-  text-transform: uppercase;
+  color: #2b2a28;
+  margin: 0;
+}
+
+h4.font{
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 38px;
   color: #2b2a28;
   margin: 0;
 }
 
 h5{
   font-family: var(--font-family);
+  font-weight: 900;
+  font-size: 29px;
+  color: #2b2a28;
+  margin: 0;
+}
+
+h5.second{
+  font-family: var(--second-family);
   font-weight: 900;
   font-size: 29px;
   color: #2b2a28;

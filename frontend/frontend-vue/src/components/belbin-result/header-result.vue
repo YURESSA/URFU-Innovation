@@ -2,7 +2,7 @@
   <header>
     <div class="header__wrapper">
       <div class="logo">
-        <img src="/src/assets/main-page/логотип ИИ 1.svg" alt="">
+        <router-link to="/"><img src="/src/assets/main-page/логотип ИИ 1.svg" alt=""></router-link>
       </div>
       <div class="title">
         <h2>Результат теста</h2>
@@ -36,9 +36,11 @@ header{
 h2{
   height: 91px;
   line-height: 180%;
+  min-width: max-content;
 }
 
 .title{
   width: 40%;
+  text-align: center;
 }
 </style>
