@@ -46,12 +46,12 @@ header{
 }
 
 .title{
-  width: 40%;
+  width: 50%;
 }
 
 .logo{
   position: relative;
-  width: 300px;
+  width: 350px;
 }
 
 .line1{
@@ -87,6 +87,7 @@ main{
 
 .slogan{
   color: #57c0cf;
+  text-transform: uppercase;
 }
 
 .charapter{
