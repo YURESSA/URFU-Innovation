@@ -15,8 +15,8 @@
 <script setup>
 import {ref} from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
-import { useDataStore } from '@/stores/store.js';
+import {useRouter} from 'vue-router';
+import {useDataStore} from '@/stores/store.js';
 
 const store = useDataStore();
 const router = useRouter();
