@@ -1,7 +1,8 @@
 import bcrypt
+from flask_login import UserMixin
 
 
-class Admin:
+class Admin(UserMixin):
     def __init__(self, username, password):
         self.username = username
         self.hashed_password = self.hash_password(password)
@@ -14,3 +15,6 @@ class Admin:
     @staticmethod
     def check_password(stored_password, provided_password):
         return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
+
+    def get_id(self):
+        return self.username

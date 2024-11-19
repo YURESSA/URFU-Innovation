@@ -8,6 +8,7 @@
 <script setup>
 const props = defineProps({
   title: String,
+})
 </script>
 
 <style scoped>
@@ -22,6 +23,19 @@ const props = defineProps({
   height: 180px;
   padding: 27px 31px;
   position: relative;
+  cursor: pointer;
+  transition: 0.5s all;
+}
+
+.test:hover{
+  background-color: #c7c7c7;
+  background-image: url('/src/assets/main-page/belbin-preview.svg');
+  background-size: cover;
+}
+
+.test:hover h2, 
+.test:hover .star{
+  display: none;
 }
 
 .star {
