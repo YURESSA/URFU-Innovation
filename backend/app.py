@@ -8,7 +8,7 @@ from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5176"])
 app.secret_key = 'URFU-INNOVATE-2024'
 admin_manager = AdminManager()
 user_manager = UserManager()
@@ -220,7 +220,6 @@ def adjust_column_widths(ws):
 def save_and_send_file(wb):
     file_stream = BytesIO()
     wb.save(file_stream)
-    wb.save('data/data.xlsx')
     file_stream.seek(0)
     return send_file(file_stream, as_attachment=True, download_name='test_results.xlsx',
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -311,8 +310,6 @@ def promote_to_super_admin():
     return jsonify({"success": is_success, "message": message}), code
 
 
-# if __name__ == "__main__":
-#    app.run()
-
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=False)
+    # app.run()

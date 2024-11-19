@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia';
 import axios from 'axios';
 
 export const useDataStore = defineStore('data', {
@@ -10,7 +10,9 @@ export const useDataStore = defineStore('data', {
     actions: {
         async fetchTests() {
             try {
-                const response = await axios.get('http://localhost:5000/api/get-all-test'); // получаю название и url
+                const response = await axios.get('http://127.0.0.1:5000/api/get-all-test', {
+                    withCredentials: true,
+                }); // получаю название и url
                 this.tests = response.data;
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
