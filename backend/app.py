@@ -2,15 +2,17 @@ from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 
 from controllers.AdminManager import AdminManager
-from controllers.DatabaseController import DatabaseController
+from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-CORS(app, resources={r'/*': {'origins': '*'}}, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["http://localhost:5176"])
 app.secret_key = 'URFU-INNOVATE-2024'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False
 admin_manager = AdminManager()
 user_manager = UserManager()
-db_controller = DatabaseController()
+test_manager = TestManager()
 
 
 @app.route('/api/register-user', methods=['POST'])
@@ -24,9 +26,8 @@ def register_user():
 
     is_success, message = user_manager.register_user(full_name, phone_number, telegram_id)
     session['telegram_id'] = telegram_id
-    code = 201
 
-    return jsonify({"telegram_id": telegram_id, "success": is_success, "message": 'Форма успешно принята'}), code
+    return jsonify({"success": is_success, "message": 'Форма успешно принята'}), 201
 
 
 @app.route('/api/get-test-results', methods=['GET'])
@@ -69,7 +70,7 @@ def logout_user():
 
 @app.route('/api/get-all-test', methods=['GET'])
 def get_all_test():
-    tests = db_controller.get_tests()
+    tests = test_manager.get_tests()
     corr_tests = []
     for test in tests:
         corr_test = {'test_title': test[0], 'test_url': test[1]}
@@ -98,9 +99,7 @@ def processing_form():
 
 def process_post_request():
     data = request.json
-    telegram_id = list(data.keys())[0]
-    data = data.get(telegram_id)
-    print(telegram_id)
+    telegram_id = session.get('telegram_id')
     if not telegram_id:
         return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
 
@@ -109,16 +108,15 @@ def process_post_request():
     user_test_id = user_manager.add_test_to_user(user_id, test_id)
 
     data = {key: int(value) for key, value in data.items()}
-    print(data)
     result = calculate_section_scores(data)
 
-    roles_data = db_controller.get_roles_and_descriptions()
+    roles_data = test_manager.get_roles_and_descriptions()
     data_percentages = calculate_percentages(result)
 
     final_data = get_top_two_sections(data_percentages)
     final_result = build_final_result(final_data, roles_data)
 
-    db_controller.save_user_answers(user_test_id, data_percentages)
+    test_manager.save_user_answers(user_test_id, data_percentages)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
 
     logout_user()
@@ -132,7 +130,7 @@ def process_post_request():
 
 
 def get_questions():
-    questions = db_controller.get_all_questions()
+    questions = test_manager.get_all_questions()
     return jsonify({"success": True, "questions": questions}), 200
 
 

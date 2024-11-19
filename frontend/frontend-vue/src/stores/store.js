@@ -5,7 +5,7 @@ export const useDataStore = defineStore('data', {
     state: () => ({
         tests: [],
         belbin: [],
-        belbinResult: [],
+        belbinResult: []
     }),
     actions: {
         async fetchTests() {
@@ -20,7 +20,16 @@ export const useDataStore = defineStore('data', {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/api/belbin-test'); // получаю вопросы теста
                 this.belbin = response.data;
-                console.log('Данные загрузил');
+                console.log('Данные загрузил')
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+            }
+        },
+        async fetchBelbinResult(){
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/api/get-test-results'); // получаю результаты теста Белбина
+                this.belbinResult = response.data;
+                console.log('Данные загрузил')
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }

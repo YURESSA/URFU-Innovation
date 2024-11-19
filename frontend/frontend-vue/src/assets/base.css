@@ -87,6 +87,14 @@ h5.second{
   margin: 0;
 }
 
+h5{
+  font-family: var(--font-family);
+  font-weight: 900;
+  font-size: 29px;
+  color: #2b2a28;
+  margin: 0;
+}
+
 span{
   font-family: var(--font-family);
   font-weight: 500;
