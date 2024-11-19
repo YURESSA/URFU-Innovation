@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify, session
+from io import BytesIO
+from openpyxl.utils import get_column_letter
+import openpyxl
+from flask import Flask, request, jsonify, session, send_file
 from flask_cors import CORS
-
 from controllers.AdminManager import AdminManager
 from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
@@ -28,38 +30,6 @@ def register_user():
     session['telegram_id'] = telegram_id
 
     return jsonify({"success": is_success, "message": 'Форма успешно принята'}), 201
-
-
-@app.route('/api/get-test-results', methods=['GET'])
-def get_test_results():
-    data = request.form
-    telegram_id = data.get('telegram_id')
-    test_name = data.get('test_name')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-
-    current_user = session.get('username')
-    if not current_user or not admin_manager.is_admin(current_user):
-        return jsonify({"success": False, "message": "Только администратторы могут выполнять данное действие!"}), 403
-
-    results = admin_manager.get_filtered_results(telegram_id, test_name, start_date, end_date)
-    return jsonify({"success": True, "results": results}), 200
-
-
-@app.route('/api/register', methods=['POST'])
-def register():
-    data = request.form
-    current_user = session.get('username')
-    if not current_user:
-        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
-
-    username = data.get('username')
-    password1 = data.get('password1')
-    password2 = data.get('password2')
-
-    is_success, message = admin_manager.register_admin(current_user, username, password1, password2)
-    code = 201 if is_success else 403
-    return jsonify({"success": is_success, "message": message}), code
 
 
 @app.route('/api/logout-user', methods=['POST'])
@@ -179,6 +149,101 @@ def build_final_result(final_data, roles_data):
     return final_result
 
 
+@app.route('/api/get-test-results', methods=['GET'])
+def get_test_results():
+    data = request.form
+    telegram_id = data.get('telegram_id')
+    test_name = data.get('test_name')
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+
+    current_user = session.get('admin_username')
+    if not current_user or not admin_manager.is_admin(current_user):
+        return jsonify({"success": False, "message": "Только администратторы могут выполнять данное действие!"}), 403
+
+    results = test_manager.get_filtered_results(telegram_id, test_name, start_date, end_date)
+
+    return jsonify({"success": True, "results": results}), 200
+
+
+@app.route('/api/save-test-results', methods=['GET'])
+def save_test_results():
+    data = request.form
+    telegram_id = data.get('telegram_id')
+    test_name = data.get('test_name')
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+
+    current_user = session.get('admin_username')
+    if not current_user or not admin_manager.is_admin(current_user):
+        return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
+
+    results = test_manager.get_filtered_results(telegram_id, test_name, start_date, end_date)
+    wb, ws = create_excel_file(results)
+    adjust_column_widths(ws)
+    return save_and_send_file(wb)
+
+
+def create_excel_file(results):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Test Results'
+
+    headers = ['Full Name', 'Phone Number', 'Telegram ID', 'Test Name', 'Timestamp', 'Sections']
+    ws.append(headers)
+
+    for result in results:
+        row = format_result_row(result)
+        ws.append(row)
+
+    return wb, ws
+
+
+def format_result_row(result):
+    full_name = result.get('full_name')
+    phone_number = result.get('phone_number')
+    telegram_id = result.get('telegram_id')
+    test_name = result.get('test_name')
+    timestamp = result.get('timestamp')
+    sections = result.get('sections')
+
+    sections_str = ', '.join([f"{key}: {value}" for key, value in sections.items()])
+    return [full_name, phone_number, telegram_id, test_name, timestamp, sections_str]
+
+
+def adjust_column_widths(ws):
+    for col in range(1, len(ws[1]) + 1):
+        column = get_column_letter(col)
+        max_length = max(len(str(cell.value)) for cell in ws[column] if cell.value is not None)
+        adjusted_width = max_length + 2
+        ws.column_dimensions[column].width = adjusted_width
+
+
+def save_and_send_file(wb):
+    file_stream = BytesIO()
+    wb.save(file_stream)
+    wb.save('data/data.xlsx')
+    file_stream.seek(0)
+    return send_file(file_stream, as_attachment=True, download_name='test_results.xlsx',
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.form
+    current_user = session.get('admin_username')
+    if not current_user:
+        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
+
+    username = data.get('username')
+    password1 = data.get('password1')
+    password2 = data.get('password2')
+
+    is_success, message = admin_manager.register_admin(current_user, username, password1, password2)
+    code = 201 if is_success else 403
+    return jsonify({"success": is_success, "message": message}), code
+
+
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.form
@@ -187,7 +252,7 @@ def login():
     is_success, message = admin_manager.login_admin(username, password)
     if not is_success:
         return jsonify({"success": False, "message": message}), 401
-    session['username'] = username
+    session['admin_username'] = username
     return jsonify({"success": is_success, "message": message}), 200
 
 
@@ -209,15 +274,15 @@ def change_password():
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    session.pop('username', None)
+    session.pop('admin_username', None)
     return jsonify({"success": True, "message": 'Вы успешно вышли'}), 200
 
 
-@app.route('/api/delete-admin', methods=['DELETE'])
+@app.route('/api/delete_admin', methods=['DELETE'])
 def delete_admin():
     data = request.form
     username = data.get('username')
-    current_user = session.get('username')
+    current_user = session.get('admin_username')
     is_success, message = admin_manager.delete_admin(current_user, username)
     code = 200 if is_success else 403
     return jsonify({"success": is_success, "message": message}), code
@@ -225,7 +290,7 @@ def delete_admin():
 
 @app.route('/api/admins', methods=['GET'])
 def get_all_admins():
-    current_user = session.get('username')
+    current_user = session.get('admin_username')
 
     is_success, result = admin_manager.get_all_admins(current_user)
     if not is_success:
@@ -236,7 +301,7 @@ def get_all_admins():
 
 @app.route('/api/promote-to-super-admin', methods=['POST'])
 def promote_to_super_admin():
-    current_user = session.get('username')
+    current_user = session.get('admin_username')
     if not current_user:
         return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
 

@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from datetime import datetime
 
 
 class TestManager:
@@ -90,3 +91,63 @@ class TestManager:
               section_values['section4'], section_values['section5'], section_values['section6'],
               section_values['section7'], section_values['section8']
               ))
+
+    def get_filtered_results(self, telegram_id=None, test_name=None, start_date=None, end_date=None):
+        query, params = self._build_query(telegram_id, test_name, start_date, end_date)
+
+        with self.get_connection() as connection:
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            results = cursor.fetchall()
+
+        roles = [v.get('role_in_team') for k, v in self.get_roles_and_descriptions().items()]
+        return self._format_results(results, roles)
+
+    def _build_query(self, telegram_id, test_name, start_date, end_date):
+        query = '''
+            SELECT u.full_name, u.phone_number, u.telegram_id, t.test_name, ut.timestamp, 
+                   ua.section1, ua.section2, ua.section3, 
+                   ua.section4, ua.section5, ua.section6, 
+                   ua.section7, ua.section8
+            FROM user_tests ut
+            JOIN users u ON u.user_id = ut.user_id
+            JOIN user_answers ua ON ua.user_test_id = ut.user_test_id
+            JOIN tests t ON t.test_id = ut.test_id
+            WHERE 1=1
+        '''
+        params = []
+
+        if telegram_id:
+            query += " AND u.telegram_id = ?"
+            params.append(telegram_id)
+        if test_name:
+            query += " AND t.test_name = ?"
+            params.append(test_name)
+        if start_date:
+            start_date = self._parse_date(start_date)
+            query += " AND ut.timestamp >= ?"
+            params.append(start_date)
+        if end_date:
+            end_date = self._parse_date(end_date)
+            query += " AND ut.timestamp <= ?"
+            params.append(end_date)
+
+        return query, params
+
+    @staticmethod
+    def _parse_date(date_str):
+        try:
+            return datetime.strptime(date_str, '%Y-%m-%d').strftime('%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _format_results(results, roles):
+        return [{
+            "full_name": r[0],
+            "phone_number": r[1],
+            "telegram_id": r[2],
+            "test_name": r[3],
+            "timestamp": r[4],
+            "sections": {role: count for count, role in zip(r[5:], roles)}
+        } for r in results]
