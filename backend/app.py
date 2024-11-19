@@ -8,10 +8,8 @@ from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:5176"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 app.secret_key = 'URFU-INNOVATE-2024'
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
 admin_manager = AdminManager()
 user_manager = UserManager()
 test_manager = TestManager()
@@ -313,5 +311,8 @@ def promote_to_super_admin():
     return jsonify({"success": is_success, "message": message}), code
 
 
-if __name__ == "__main__":
-    app.run()
+# if __name__ == "__main__":
+#    app.run()
+
+if __name__ == '__main__':
+    app.run(host='localhost', port=5000, debug=False)

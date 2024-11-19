@@ -37,6 +37,10 @@ onMounted(async () => {
 const test = computed(() => store.getBelbin);
 const charapter = ref(1);
 
+function updateCharapter(value) {
+  charapter.value = value;
+}
+
 function updateRemainingPoints(value) {
   remainingPoints.value = value; // обновляем оставшиеся баллы
 }

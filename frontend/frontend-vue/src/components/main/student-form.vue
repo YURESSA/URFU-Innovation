@@ -15,7 +15,6 @@
 <script setup>
 import {ref} from 'vue';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import {useRouter} from 'vue-router';
 import {useDataStore} from '@/stores/store.js';
 
@@ -31,7 +30,7 @@ function handleSubmit(event) {
   const formData = new FormData(studentForm.value);
   sumbitButton.value.disabled = true;
 
-  axios.post('http://127.0.0.1:5000/api/register-user', formData, {
+  axios.post('http://localhost:5000/api/register-user', formData, {
     withCredentials: true,
   })
       .then(response => {
