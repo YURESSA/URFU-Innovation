@@ -8,7 +8,7 @@ from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:5176"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 app.secret_key = 'URFU-INNOVATE-2024'
 admin_manager = AdminManager()
 user_manager = UserManager()

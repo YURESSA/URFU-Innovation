@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
+export const baseUrl = 'http://localhost:5000'
+
 export const useDataStore = defineStore('data', {
     state: () => ({
         tests: [],
@@ -10,9 +12,7 @@ export const useDataStore = defineStore('data', {
     actions: {
         async fetchTests() {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/get-all-test', {
-                    withCredentials: true,
-                }); // получаю название и url
+                const response = await axios.get(`${baseUrl}/api/get-all-test`); // получаю название и url
                 this.tests = response.data;
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
@@ -20,7 +20,7 @@ export const useDataStore = defineStore('data', {
         },
         async fetchBelbin() {
             try {
-                const response = await axios.get('http://localhost:5000/api/belbin-test', {
+                const response = await axios.get(`${baseUrl}/api/belbin-test`, {
                     withCredentials: true,
                 }); // получаю вопросы теста
                 this.belbin = response.data;
@@ -31,7 +31,7 @@ export const useDataStore = defineStore('data', {
         },
         async fetchBelbinResult(result) {
             try {
-                const response = await axios.post('http://localhost:5000/api/belbin-test', result, {
+                const response = await axios.post(`${baseUrl}/api/belbin-test`, result, {
                     withCredentials: true,
                 }); // получаю результаты теста Белбина
                 this.belbinResult = response.data;

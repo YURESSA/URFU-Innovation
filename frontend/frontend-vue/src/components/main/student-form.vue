@@ -17,6 +17,7 @@ import {ref} from 'vue';
 import axios from 'axios';
 import {useRouter} from 'vue-router';
 import {useDataStore} from '@/stores/store.js';
+import { baseUrl } from '@/stores/store.js';
 
 const store = useDataStore();
 const router = useRouter();
@@ -30,7 +31,7 @@ function handleSubmit(event) {
   const formData = new FormData(studentForm.value);
   sumbitButton.value.disabled = true;
 
-  axios.post('http://localhost:5000/api/register-user', formData, {
+  axios.post(`${baseUrl}/api/register-user`, formData, {
     withCredentials: true,
   })
       .then(response => {
