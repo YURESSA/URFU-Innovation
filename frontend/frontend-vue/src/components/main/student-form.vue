@@ -3,10 +3,24 @@
     <div class="form">
       <h3>Заполните данные</h3>
       <form ref="studentForm" method="post" @submit="handleSubmit">
-        <input type="text" name="full_name" placeholder="ФИО" required>
-        <input type="tel" name="phone_number" placeholder="Номер телефона" required>
-        <input type="text" name="telegram_id" placeholder="Телеграмм" required>
-        <button ref="sumbitButton" type="submit"><span>Перейти к тесту</span></button>
+        <input type="text" name="full_name" autocomplete="off" placeholder="ФИО" required>
+        <input 
+        type="tel" 
+        v-model="phoneNumber"
+        name="phone_number" 
+        autocomplete="off" 
+        required
+        @input="validatePhoneNumber">
+        <input 
+        type="text" 
+        v-model="telegramId"
+        name="telegram_id" 
+        autocomplete="off" 
+        placeholder="Телеграмм: @userName" 
+        required
+        @input="validateTelegramId">
+        <button ref="sumbitButton" type="submit" ><span>Перейти к тесту</span></button>
+        <p v-if="!isValid" class="error">{{ errorMessage }}</p>
       </form>
     </div>
   </div>
@@ -25,6 +39,45 @@ const studentForm = ref(null);
 const sumbitButton = ref(null);
 
 const props = defineProps(['testUrl']);
+
+const phoneNumber = ref('+7')
+const telegramId = ref('')
+const isValid = ref(true);
+const errorMessage = ref('')
+
+const validatePhoneNumber = (event) =>{
+  let input = event.target.value;
+  if (!input.startsWith('+7')) {
+    input = '+7';
+  }
+  input = '+7' + input.slice(2).replace(/[^\d]/g, '');
+  if (input.length > 12) {
+    input = input.slice(0, 12);
+  }
+  phoneNumber.value = input;
+  isValid.value = phoneNumber.value.length === 12;
+  if(!isValid.value){
+    errorMessage.value = 'Некорректный номер телефона'
+  }
+}
+
+const validateTelegramId = (event) => {
+  let input = event.target.value;
+  if (input.startsWith('https://t.me/')) {
+    input = '@' + input.slice(13);
+  }
+  if (input.length > 33) {
+    input = input.slice(0, 33);
+  }
+  telegramId.value = input;
+  isValid.value = /^@[a-zA-Z0-9_]{5,32}$/.test(input);
+
+  if (!isValid.value) {
+    errorMessage.value = 'Некорректный телеграмм';
+  } else {
+    errorMessage.value = '';
+  }
+};
 
 function handleSubmit(event) {
   event.preventDefault();

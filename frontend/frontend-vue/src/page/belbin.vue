@@ -1,15 +1,17 @@
 <template>
   <div class="page__wrapper" v-if="isLoading">
-    <chapter-one-header v-if="charapter == 1" :charapter="charapter"></chapter-one-header>
-    <belbin-header v-if="charapter != 1" :charapter="charapter"></belbin-header>
+    <chapter-one-header v-if="chapter == 1" :chapter="chapter"></chapter-one-header>
+    <belbin-header v-if="chapter != 1" :chapter="chapter"></belbin-header>
     <test-belbin 
       class="main" 
-      :charapter="charapter" 
+      :chapter="chapter" 
       :test="test" 
-      @updateRemainingPoints="updateRemainingPoints"
-      @updateSliderValues="updateSliderValues"
+      :remainedPoints="remainedPoints"
+      :currentValue="currentValue"
+      @updateRemained="updateRemained"
+      @updateResult="updateResult"
     ></test-belbin>
-    <belbin-footer :charapter="charapter" :remainingPoints="remainingPoints" :sliderValues="sliderValues" @incrementCharapter="charapter++"></belbin-footer> <!-- Передаем sliderValues в belbin-footer -->
+    <belbin-footer :chapter="chapter" :remainedPoints="remainedPoints" :result="result" @updateResult="updateResult" @incrementchapter="chapter++"></belbin-footer>
   </div>
   <div v-else>
     Загрузка...
@@ -26,8 +28,7 @@ import BelbinHeader from '@/components/belbin/belbin-header.vue';
 
 const store = useDataStore();
 const isLoading = ref(false);
-const remainingPoints = ref(10); // начальное количество оставшихся баллов
-const sliderValues = ref([]); // создаем переменную для хранения значений слайдеров
+
 
 onMounted(async () => {
   await store.fetchBelbin();
@@ -35,19 +36,52 @@ onMounted(async () => {
 });
 
 const test = computed(() => store.getBelbin);
-const charapter = ref(1);
+const chapter = ref(1);
+const remainedPoints = ref(10);
+const result = [];
 
-function updateCharapter(value) {
-  charapter.value = value;
+const currentValue = ref([
+  {
+    points: ref(0),
+  },
+  {
+    points: ref(0),
+  },
+  {
+    points: ref(0),
+  },
+  {
+    points: ref(0),
+  },
+  {
+    points: ref(0),
+  },
+  {
+    points: ref(0),
+  },
+  {
+    points: ref(0),
+  },
+  {
+    points: ref(0),
+  },
+]);
+
+const updateRemained = (newPoint) =>{
+  remainedPoints.value = newPoint;
 }
 
-function updateRemainingPoints(value) {
-  remainingPoints.value = value; // обновляем оставшиеся баллы
+const updateResult = () =>{
+  let chapterResult = [];
+  currentValue.value.forEach((e) => {
+    chapterResult.push(e.points)
+  });
+  result.push(chapterResult)
+  currentValue.value.forEach((e) => {
+    e.points = 0
+  });
 }
 
-function updateSliderValues(values) {
-  sliderValues.value = values; // обновляем значения слайдеров
-}
 </script>
 
 <style scoped>
