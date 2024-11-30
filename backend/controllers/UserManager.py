@@ -34,13 +34,13 @@ class UserManager:
     def _create_user_tests_table(cursor):
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_tests (
-                user_test_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER,
-                test_id INTEGER,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (user_id),
-                FOREIGN KEY (test_id) REFERENCES tests (test_id)
-            )
+            user_test_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            test_id INTEGER,
+            timestamp DATETIME DEFAULT (strftime('%Y-%m-%d %H:%M', CURRENT_TIMESTAMP)),
+            FOREIGN KEY (user_id) REFERENCES users (user_id),
+            FOREIGN KEY (test_id) REFERENCES tests (test_id)
+                )
         ''')
 
     @staticmethod
@@ -94,7 +94,7 @@ class UserManager:
             UPDATE user_tests
             SET timestamp = ?
             WHERE user_test_id = ?
-        ''', (datetime.now(), user_test_id))
+        ''', (datetime.now().strftime('%Y-%m-%d %H:%M'), user_test_id))
 
     @staticmethod
     def _insert_new_user_test(cursor, user_id, test_id):

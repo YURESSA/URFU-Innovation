@@ -18,7 +18,7 @@
         По результатам прохождения теста будет определена <b>ваша роль</b> в команде.</p>
     </div>
     <div class="charapter">
-      <h4><span>{{ charapter }}</span> раздел из 7</h4>
+      <h4><span>{{ chapter }}</span> раздел из 7</h4>
     </div>
   </header>
 </template>
@@ -27,7 +27,7 @@
 import { defineProps } from 'vue';
 
 const props = defineProps({
-  charapter: Number
+  chapter: Number
 });
 </script>
 

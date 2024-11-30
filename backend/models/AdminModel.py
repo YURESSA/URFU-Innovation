@@ -1,8 +1,7 @@
 import bcrypt
-from flask_login import UserMixin
 
 
-class Admin(UserMixin):
+class Admin:
     def __init__(self, username, password):
         self.username = username
         self.hashed_password = self.hash_password(password)

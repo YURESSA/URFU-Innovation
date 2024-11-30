@@ -4,8 +4,8 @@
       <div class="logo">
         <img src="/src/assets/main-page/логотип ИИ 1.svg" alt="">
       </div>
-      <div class="charapter">
-        <h4><span>{{ charapter }}</span> раздел из 7</h4>
+      <div class="chapter">
+        <h4><span>{{ chapter }}</span> раздел из 7</h4>
       </div>
       <button @click="">Инструкция</button>
     </div>
@@ -16,7 +16,7 @@
 import { defineProps } from 'vue';
 
 const props = defineProps({
-  charapter: Number
+  chapter: Number
 });
 </script>
 

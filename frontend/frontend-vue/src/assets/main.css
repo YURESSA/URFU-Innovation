@@ -11,4 +11,6 @@ body {
   margin: 0;
 }
 
-
+thead > tr{
+  background-color: rgb(123, 221, 221);
+}
