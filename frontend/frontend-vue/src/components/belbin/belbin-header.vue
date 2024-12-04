@@ -7,17 +7,19 @@
       <div class="chapter">
         <h4><span>{{ chapter }}</span> раздел из 7</h4>
       </div>
-      <button @click="">Инструкция</button>
+      <button @click="emit('openInstruction')">Инструкция</button>
     </div>
   </header>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
   chapter: Number
 });
+
+const emit = defineEmits(['openInstruction'])
 </script>
 
 <style scoped>
@@ -32,6 +34,8 @@ header{
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  padding-top: 40px;
 }
 
 h4{
@@ -52,6 +56,23 @@ button{
   width: 20%;
   height: 30%;
   background-color: #57c0cf;
-  margin-top: 25px;
+  margin-bottom: -25px;
+}
+
+@media screen and (max-width: 980px) {
+  .header__wrapper{
+    width: 75%;
+  }
+  .chapter{
+    order: 1;
+  }
+  button{
+    width: 50%;
+  }
+  .logo > img{
+    width: 70px;
+    height: 40px;
+    margin-bottom: -25px;
+  }
 }
 </style>

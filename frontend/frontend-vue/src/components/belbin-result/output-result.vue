@@ -8,6 +8,7 @@
       <div class="role" v-for="(item, i) in data" :key="i">
         <div class="name">
           <h5 class="second">{{ item.role }}</h5>
+          <img :src="`/src/assets/belbin-result/${item.file_name}`" alt="">
         </div>
         <p>{{ item.description }}</p>
       </div>
@@ -59,11 +60,24 @@ main{
   flex-direction: column;
   align-items: center;
   width: 80%;
+  gap: 40px;
 }
 
 .role{
   display: flex;
   gap: 60px;
+}
+
+.name{ 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.name > img{
+  width: 250px;
+  height: 300px;
 }
 
 .role .name{
@@ -78,4 +92,18 @@ main{
   min-height: 190px;
 }
 
+h4{
+  width: max-content;
+}
+
+@media screen and (max-width: 980px) {
+  .title > img{
+    display: none;
+  }
+  .role{
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+}
 </style>

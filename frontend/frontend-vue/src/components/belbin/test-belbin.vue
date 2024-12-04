@@ -87,4 +87,10 @@ main {
   width: 100%;
   margin-top: 20px;
 }
+
+@media screen and (max-width: 980px) {
+  .test-form{
+    width: 75%;
+  }
+}
 </style>

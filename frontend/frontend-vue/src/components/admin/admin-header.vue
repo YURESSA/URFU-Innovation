@@ -1,13 +1,14 @@
 <template>
   <header>
     <div class="interaction">
-      <button>Добавить нового администратора</button>
+      <button @click="emit('openForm')">Добавить нового администратора</button>
       <button @click="logout">Выйти <img src="/src/assets/admin/exit-svg.svg"></button>
     </div>
   </header>
 </template>
 
 <script setup>
+import { defineEmits } from 'vue';
 import axios from 'axios';
 import { baseUrl } from '@/stores/store';
 import {useRouter} from 'vue-router';
@@ -15,15 +16,13 @@ import Cookies from 'js-cookie';
 
 const router = useRouter();
 
+const emit = defineEmits(['openForm'])
+
 const logout = () =>{
-  axios.get(`${baseUrl}/api/logout`,{
-    withCredentials: true,
+  axios.get(`${baseUrl}/api/logout`, {
+    withCredentials: true
   })
   .then(response => {
-    console.log(response.data.message);
-    console.log(document.cookie);
-    Cookies.remove('session');
-    console.log(document.cookie);
     router.push('/admin');
   })
 }

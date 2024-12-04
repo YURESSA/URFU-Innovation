@@ -1,5 +1,5 @@
 <template>
-  <DataTable class="table" removableSort scrollable scrollHeight="750px" :value="dataBase" tableStyle="max-width: 60vw;">
+  <DataTable class="table" removableSort scrollable scrollHeight="450px" :value="dataBase" tableStyle="max-width: 60vw;">
     <button @click="exportExcel">Скачать Excel</button>
     <Column field="test_name" sortable  header="Тест"></Column>
     <Column field="full_name" sortable  header="ФИО"></Column>
@@ -78,4 +78,14 @@ thead > tr{
   background-color: rgb(123, 221, 221);
 }
 
+button {
+  border: 0.50px solid #2b2a28;
+  border-radius: 7px;
+  background-color: #35818d;
+  padding: 10px 25px;
+}
+
+button:hover {
+  background-color: #4597a3;
+}
 </style>

@@ -15,6 +15,7 @@ import OutputResult from '@/components/belbin-result/output-result.vue';
 
 const store = useDataStore();
 const result = computed(() => store.getBelbinResult);
+console.log(result.value)
 
 const diagresult = Object.entries(result.value.all_roles).map(([key, value]) => ({
       name: key,
@@ -26,7 +27,7 @@ const diagresult = Object.entries(result.value.all_roles).map(([key, value]) => 
 .page__wrapper{
   min-height: 100vh;
   width: 100vw;
-  background-color: #eee5e5;
+  background-color: #FEFEFE;
   padding-bottom: 50px;
   display: flex;
   flex-direction: column;

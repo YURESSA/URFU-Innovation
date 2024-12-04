@@ -14,7 +14,6 @@
 }
 
 body {
-  min-height: 100vh;
   color: #2b2a28;
   font-size: 16px;
   overflow-x: hidden;
@@ -99,4 +98,18 @@ p{
   font-weight: 200;
   font-size: 16px;
   color: #2b2a28;
+}
+
+@media screen and (max-width: 980px){
+  h1 {
+    font-size: 96px;
+    line-height: 100%;
+  }
+  h2{
+    font-size: 40px;
+    line-height: 120%;
+  }
+  h3{
+    font-size: 30px;
+  }
 }

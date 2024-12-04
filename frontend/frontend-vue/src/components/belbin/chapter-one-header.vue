@@ -2,7 +2,7 @@
   <header>
     <div class="header__wrapper">
       <div class="title">
-        <h1>Тест Белбина</h1>
+        <h1>Тест <br> Белбина</h1>
       </div>
       <div class="logo">
         <img src="/src/assets/belbin/line1.svg" class="line1" alt="">
@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="description">
-      <h4 class="slogan">определи свою роль в команде</h4>
+      <h4 class="slogan">определи свою роль в команде!</h4>
       <p>В каждой из семи частей данного теста распределите <b>10</b> баллов между <b>8</b> утверждениями. <br>
         Если вы согласны с каким-либо утверждением на все <b>100%</b>, вы можете отдать ему все <b>10</b> баллов.</p>
       <p>Рекомендуем распределять баллы <b>5/3/2</b> для достоверности результата.
@@ -46,7 +46,7 @@ header{
 }
 
 .title{
-  width: 50%;
+  width: max-content;
 }
 
 .logo{
@@ -100,5 +100,37 @@ span{
   font-size: inherit;
   font-weight: inherit;
   color: #57c0cf;
+}
+
+@media screen and (max-width: 980px) {
+  .header__wrapper{
+    flex-direction: column-reverse;
+    align-items: center;
+    padding-top: 110px;
+  }
+  .line1{
+    width: 95px;
+    height: 140px;
+    top: -80px;
+    left: 180px;
+  }
+  .line2{
+    width: 100px;
+    height: 85px;
+    top: 15px;
+    left: 250px;
+  }
+  .urfu{
+    width: 70px;
+    height: 40px;
+    top: -60px;
+    left: 280px;
+  }
+  h4{
+    font-size: 24px;
+  }
+  .description, .charapter{
+    width: 75%;
+  }
 }
 </style>

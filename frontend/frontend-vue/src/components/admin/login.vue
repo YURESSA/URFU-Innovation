@@ -2,7 +2,7 @@
   <div class="form__wrapper">
     <div class="form">
       <h3>Вход</h3>
-      <form ref="studentForm" method="post">
+      <form ref="creatAdmin" method="post">
         <input type="text" name="username" autocomplete="off" placeholder="Логин" required>
         <input type="password" name="password" autocomplete="off" placeholder="Пароль" required>
         <button ref="sumbitButton" type="submit" @click="submitData">Войти</button>
@@ -21,11 +21,11 @@ import {useRouter} from 'vue-router';
 const isValid = ref(true);
 const sumbitButton = ref(null);
 const router = useRouter();
-const studentForm = ref(null);
+const creatAdmin = ref(null);
 
 function submitData(event){
   event.preventDefault();
-  const formData = new FormData(studentForm.value);
+  const formData = new FormData(creatAdmin.value);
   sumbitButton.value.disabled = true;
 
   axios.post(`${baseUrl}/api/login`, formData, {

@@ -68,4 +68,18 @@ button{
   display: flex;
   justify-content: space-between;
 }
+
+@media screen and (max-width: 980px) {
+  .footer__wrapper{
+    width: 75%;
+    align-items: center;
+  }
+  button{
+    width: 30%;
+    height: 35px;
+  }
+  h5{
+    font-size: 20px;
+  }
+}
 </style>

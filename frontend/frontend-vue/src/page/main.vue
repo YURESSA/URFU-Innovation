@@ -2,13 +2,15 @@
   <div class="page__wrapper">
     <header>
       <div class="header__wrapper">
-        <h1>Тесты</h1>
+        <div class="title">
+          <h1>Тесты</h1>
+          <h2>предпринимательских <br> компетенций</h2>
+        </div>
         <div class="logo">
           <img src="../assets/main-page/элемент-линии.svg" class="line" alt="" />
           <img src="../assets/main-page/логотип ИИ 1.svg" class="urfu" alt="инновационная инфраструктура УрФУ"/>
         </div>
       </div>
-      <h2>предпринимательских компетенций</h2>
     </header>
     <main>
       <div v-for="(item, i) in tests" :key="i">
@@ -16,7 +18,7 @@
       </div>
       <student-form
         v-if="isFormVisible"
-        :test-url="selectedTestUrl"></student-form>
+        :test-url="selectedTestUrl" @closeForm="closeForm"></student-form>
     </main>
   </div>
 </template>
@@ -38,12 +40,18 @@ function openForm(testUrl) {
   document.body.classList.add('modal-open');
 }
 
+function closeForm() {
+  isFormVisible.value = false;
+  selectedTestUrl.value = '';
+  document.body.classList.remove('modal-open');
+}
+
 </script>
 
 <style scoped>
 .page__wrapper{
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: rgb(80, 188, 190);
   background: linear-gradient(30deg, rgba(80, 188, 190, 1) 0%, rgba(164, 215, 215, 1) 75%, rgba(236, 237, 237, 1) 100%);
 }
@@ -59,12 +67,12 @@ header{
 .header__wrapper {
   display: flex;
   align-items: center;
-  width: 679px;
 }
 
 .logo {
   position: relative;
-  margin-left: 30px;
+  left: 10px;
+  top: -50px;
 }
 
 .line{
@@ -79,7 +87,6 @@ header{
 }
 
 h2{
-  font-size: 82px;
   max-width: 679px;
 }
 
@@ -90,12 +97,32 @@ main{
   flex-wrap: wrap;
 }
 
-.hidden{
-  /* display: none; */
+.modal-open{
+  overflow-y: hidden;
 }
 
-.modal-open{
-  overflow: hidden;
+@media screen and (max-width: 980px) {
+  header{
+    padding-top: 150px;
+  }
+  .header__wrapper {
+    flex-direction: column-reverse;
+  }
+  .logo{
+    left: 0px;
+    top: 0px;
+  }
+  .line{
+    width: 120px;
+    height: 110px;
+  }
+  .urfu{
+    position: absolute;
+    right: -175px;
+    top: -80px;
+    width: 90px;
+    height: 50px;
+  }
 }
 
 </style>

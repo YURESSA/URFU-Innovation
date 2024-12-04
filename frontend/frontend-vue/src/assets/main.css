@@ -1,7 +1,15 @@
 @import url('./base.css');
 
+@media screen and (max-width: 980px){
+  #app {
+    max-width: 95%;
+    margin: 1000px;
+    font-weight: normal;
+  }
+}
+
 #app {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0;
   font-weight: normal;
 }
@@ -13,4 +21,9 @@ body {
 
 thead > tr{
   background-color: rgb(123, 221, 221);
+}
+
+
+.modal-open{
+  overflow: hidden;
 }
