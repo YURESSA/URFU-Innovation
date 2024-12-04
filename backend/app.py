@@ -185,8 +185,8 @@ def create_excel_file(results):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = 'Test Results'
-
-    headers = ['Full Name', 'Phone Number', 'Telegram ID', 'Test Name', 'Timestamp', 'Sections']
+    keys = list(results[0].get('sections').keys())
+    headers = ['ФИО', 'Номер телефона', 'Telegram ID', 'Название теста', 'Время прохождения'] + keys
     ws.append(headers)
 
     for result in results:
@@ -203,9 +203,8 @@ def format_result_row(result):
     test_name = result.get('test_name')
     timestamp = result.get('timestamp')
     sections = result.get('sections')
-
-    sections_str = ', '.join([f"{key}: {value}" for key, value in sections.items()])
-    return [full_name, phone_number, telegram_id, test_name, timestamp, sections_str]
+    sections_str = [str(i) for i in sections.values()]
+    return [full_name, phone_number, telegram_id, test_name, timestamp] + sections_str
 
 
 def adjust_column_widths(ws):
