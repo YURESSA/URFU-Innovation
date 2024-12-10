@@ -8,7 +8,14 @@ from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+allowed_origins = [
+    "http://127.0.0.1:5000",
+    "http://localhost:5173"
+]
+app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
+                  PERMANENT_SESSION_LIFETIME=86400)
+
+CORS(app, supports_credentials=True, origins=allowed_origins)
 app.secret_key = 'URFU-INNOVATE-2024'
 admin_manager = AdminManager()
 user_manager = UserManager()
@@ -75,15 +82,14 @@ def process_post_request():
     test_id = 1
     user_test_id = user_manager.add_test_to_user(user_id, test_id)
 
-    data = {key: int(value) for key, value in data.items()}
     result = calculate_section_scores(data)
 
     roles_data = test_manager.get_roles_and_descriptions()
     data_percentages = calculate_percentages(result)
-
-    final_data = get_top_two_sections(data_percentages)
-    final_result = build_final_result(final_data, roles_data)
-
+    data_percentages = dict(sorted(data_percentages.items(), key=lambda item: item[1], reverse=True))
+    top_result, bottom_result = get_tops_and_bottoms_sections(data_percentages)
+    built_top_result = build_top_result(top_result, roles_data)
+    built_bottom_result = build_bottom_result(bottom_result, roles_data)
     test_manager.save_user_answers(user_test_id, data_percentages)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
 
@@ -92,7 +98,8 @@ def process_post_request():
     return jsonify({
         "success": True,
         "message": "Форма успешно принята",
-        "prefer_roles": final_result,
+        "prefer_roles": built_top_result,
+        "un_prefer_roles": built_bottom_result,
         "all_roles": data_roles
     }), 200
 
@@ -104,22 +111,14 @@ def get_questions():
 
 def calculate_section_scores(data):
     return {
-        'section1': data.get('3section1') + data.get('2section2') + data.get('6section3') + data.get('1section4') +
-                    data.get('5section6') + data.get('7section7') + data.get('4section8'),
-        'section2': data.get('7section1') + data.get('4section2') + data.get('3section3') + data.get('5section4') +
-                    data.get('2section5') + data.get('1section6') + data.get('6section7'),
-        'section3': data.get('6section1') + data.get('1section3') + data.get('3section4') + data.get('4section5') +
-                    data.get('7section6') + data.get('2section7') + data.get('5section8'),
-        'section4': data.get('5section1') + data.get('7section2') + data.get('4section3') + data.get('2section4') +
-                    data.get('6section5') + data.get('3section7') + data.get('1section8'),
-        'section5': data.get('2section1') + data.get('5section2') + data.get('4section4') + data.get('7section5') +
-                    data.get('6section6') + data.get('1section7') + data.get('3section8'),
-        'section6': data.get('4section1') + data.get('1section2') + data.get('6section2') + data.get('5section3') +
-                    data.get('3section5') + data.get('2section6') + data.get('7section8'),
-        'section7': data.get('1section1') + data.get('2section3') + data.get('7section4') + data.get('5section5') +
-                    data.get('3section6') + data.get('4section7') + data.get('6section8'),
-        'section8': data.get('3section2') + data.get('7section3') + data.get('6section4') + data.get('1section5') +
-                    data.get('4section6') + data.get('5section7') + data.get('2section8'),
+        'section1': data[2][0] + data[1][1] + data[5][2] + data[0][3] + data[4][5] + data[6][6] + data[3][7],
+        'section2': data[6][0] + data[3][1] + data[2][2] + data[4][3] + data[1][4] + data[0][5] + data[5][6],
+        'section3': data[5][0] + data[0][2] + data[2][3] + data[3][4] + data[6][5] + data[1][6] + data[4][7],
+        'section4': data[4][0] + data[6][1] + data[3][2] + data[1][3] + data[5][4] + data[2][6] + data[0][7],
+        'section5': data[1][0] + data[4][1] + data[3][3] + data[6][4] + data[5][5] + data[0][6] + data[2][7],
+        'section6': data[3][0] + data[0][1] + data[5][1] + data[4][2] + data[2][4] + data[1][5] + data[6][7],
+        'section7': data[0][0] + data[1][2] + data[6][3] + data[4][4] + data[2][5] + data[3][6] + data[5][7],
+        'section8': data[2][1] + data[6][2] + data[5][3] + data[0][4] + data[3][5] + data[4][6] + data[1][7],
     }
 
 
@@ -128,13 +127,46 @@ def calculate_percentages(result):
     return {key: round((value / total_sum) * 100) for key, value in result.items()}
 
 
-def get_top_two_sections(data_percentages):
-    sorted_values = sorted(set(data_percentages.values()), reverse=True)[:2]
-    top_two_values = set(sorted_values)
-    return {key: value for key, value in data_percentages.items() if value in top_two_values}
+def get_tops_and_bottoms_sections(data_percentages):
+    filtered_data = {key: value for key, value in data_percentages.items() if value > 0}
+    sorted_values = sorted(set(filtered_data.values()), reverse=True)
+    top_two_values = set(sorted_values[:2])
+    top_result = {key: value for key, value in filtered_data.items() if value in top_two_values}
+
+    if len(top_result) < 3:
+        top_two_values = set(sorted_values[:3])
+        top_result = {key: value for key, value in filtered_data.items() if value in top_two_values}
+
+    filtered_data = {key: value for key, value in filtered_data.items() if key not in top_result}
+    sorted_values_bottom = sorted(set(filtered_data.values()))
+    bottom_two_values = set(sorted_values_bottom[:2])
+    bottom_result = {key: value for key, value in filtered_data.items() if
+                     value in bottom_two_values and key not in top_result}
+
+    if len(bottom_result) < 3:
+        bottom_two_values = set(sorted_values_bottom[:3])
+        bottom_result = {key: value for key, value in filtered_data.items() if
+                         value in bottom_two_values and key not in top_result}
+
+    return top_result, bottom_result
 
 
-def build_final_result(final_data, roles_data):
+def build_top_result(final_data, roles_data):
+    final_result = []
+    for section, value in final_data.items():
+        role_info = roles_data.get(section)
+        if role_info:
+            final_result.append({
+                'role': role_info['role_in_team'],
+                'strong_side': role_info['strong-side'],
+                'value': value,
+                'description': role_info['description'],
+                'file_name': role_info['file_name']
+            })
+    return final_result
+
+
+def build_bottom_result(final_data, roles_data):
     final_result = []
     for section, value in final_data.items():
         role_info = roles_data.get(section)
@@ -142,7 +174,10 @@ def build_final_result(final_data, roles_data):
             final_result.append({
                 'role': role_info['role_in_team'],
                 'value': value,
-                'description': role_info['description']
+                'weak_side': role_info['weak-side'],
+                'recommendations': role_info['recommendations'],
+                'description': role_info['description'],
+                'file_name': role_info['file_name']
             })
     return final_result
 
@@ -171,7 +206,6 @@ def save_test_results():
     test_name = data.get('test_name')
     start_date = data.get('start_date')
     end_date = data.get('end_date')
-
     current_user = session.get('admin_username')
     if not current_user or not admin_manager.is_admin(current_user):
         return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
@@ -186,8 +220,8 @@ def create_excel_file(results):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = 'Test Results'
-
-    headers = ['Full Name', 'Phone Number', 'Telegram ID', 'Test Name', 'Timestamp', 'Sections']
+    keys = list(results[0].get('sections').keys())
+    headers = ['ФИО', 'Номер телефона', 'Telegram ID', 'Название теста', 'Время прохождения'] + keys
     ws.append(headers)
 
     for result in results:
@@ -204,9 +238,8 @@ def format_result_row(result):
     test_name = result.get('test_name')
     timestamp = result.get('timestamp')
     sections = result.get('sections')
-
-    sections_str = ', '.join([f"{key}: {value}" for key, value in sections.items()])
-    return [full_name, phone_number, telegram_id, test_name, timestamp, sections_str]
+    sections_str = [str(i) for i in sections.values()]
+    return [full_name, phone_number, telegram_id, test_name, timestamp] + sections_str
 
 
 def adjust_column_widths(ws):
@@ -250,7 +283,8 @@ def login():
     if not is_success:
         return jsonify({"success": False, "message": message}), 401
     session['admin_username'] = username
-    return jsonify({"success": is_success, "message": message}), 200
+    role = admin_manager.is_super_admin(username)
+    return jsonify({"success": is_success, "message": message, "super_admin": role}), 200
 
 
 @app.route('/api/change-password', methods=['POST'])
@@ -269,7 +303,7 @@ def change_password():
     return jsonify({"success": is_success, "message": message}), code
 
 
-@app.route('/api/logout', methods=['POST'])
+@app.route('/api/logout', methods=['GET'])
 def logout():
     session.pop('admin_username', None)
     return jsonify({"success": True, "message": 'Вы успешно вышли'}), 200
@@ -311,5 +345,5 @@ def promote_to_super_admin():
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000, debug=False)
-    # app.run()
+    # app.run(host='localhost', port=5000, debug=False)
+    app.run()

@@ -60,12 +60,37 @@ button{
   border-radius: 7px;
   width: 20%;
   height: 100%;
-  background-color: #a6a6a6;
+  background-color: #57C0CF;
+  justify-content: center;
+  color: black;
+}
+
+button:hover{
+  background-color: #7EEBFB
+}
+
+button:disabled{
+  background-color: #A6A6A6;
+  color: black;
 }
 
 .footer__wrapper{
   width: 50%;
   display: flex;
   justify-content: space-between;
+}
+
+@media screen and (max-width: 980px) {
+  .footer__wrapper{
+    width: 75%;
+    align-items: center;
+  }
+  button{
+    width: 30%;
+    height: 35px;
+  }
+  h5{
+    font-size: 18px;
+  }
 }
 </style>

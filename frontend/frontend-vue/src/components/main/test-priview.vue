@@ -38,9 +38,21 @@ const props = defineProps({
   display: none;
 }
 
+h2{
+  font-size: 64px;
+  font-weight: 500;
+  width: 100px;
+}
+
 .star {
   position: absolute;
   top: 0px;
   right: 0px;
+}
+
+@media screen and (max-width: 980px) {
+  .star{
+    width: 150px;
+  }
 }
 </style>

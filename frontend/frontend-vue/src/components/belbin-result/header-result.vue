@@ -43,4 +43,17 @@ h2{
   width: 40%;
   text-align: center;
 }
+
+@media screen and (max-width: 980px) {
+  .header__wrapper{
+    width: 85%;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  img{
+    width: 70px;
+    height: 40px;
+  }
+}
 </style>

@@ -1,22 +1,12 @@
 <template>
   <h4>Диаграмма с процентным соотношением ролей</h4>
   <div id="chart">
-    <apexchart type="radar" height="350" :options="chartOptions" :series="series"></apexchart>
+    <apexchart class="vue-chart" type="radar" height="350" :options="chartOptions" :series="series"></apexchart>
   </div>
 </template>
 
 <script setup>
-// import { ref, defineProps } from 'vue'
-// import { Chart, Responsive, Pie, Tooltip, Radar } from 'vue3-charts'
-
-
-// const props = defineProps({
-//   result: Object
-// })
-
-
-// const data = ref(props.result)
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, computed } from 'vue'
 
 const props = defineProps({
   result: Object
@@ -24,6 +14,14 @@ const props = defineProps({
 
 const roles = props.result.map(item => item.name);
 const percentages = props.result.map(item => item.pl); 
+const mq = ref(window.matchMedia('(max-width: 980px)'))
+const radarSize = computed(() =>{
+  if(mq.value.matches){
+    return 100
+  } else {
+    return 140
+  }
+})
 
 const series = ref([
   {
@@ -42,7 +40,7 @@ const chartOptions = ref({
   },
   plotOptions: {
     radar: {
-      size: 140,
+      size: radarSize,
       polygons: {
         strokeColors: '#e9e9e9',
         fill: {

@@ -3,7 +3,6 @@
     <div class="test-form">
       <div class="question">
         <h4>{{ test.questions[chapter - 1].block_name }}</h4>
-        {{ currentValue }}
       </div>
       <div class="form">
         <div class="form__wrapper">
@@ -17,7 +16,6 @@
             :index="i"
             @updateRemained="updateRemainedPoints"
             />
-            {{ item.points }}
           </div>
         </div>
       </div>
@@ -88,5 +86,11 @@ main {
   position: relative;
   width: 100%;
   margin-top: 20px;
+}
+
+@media screen and (max-width: 980px) {
+  .test-form{
+    width: 75%;
+  }
 }
 </style>

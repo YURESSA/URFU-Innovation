@@ -1,7 +1,8 @@
 <template>
   <div class="page__wrapper" v-if="isLoading">
     <chapter-one-header v-if="chapter == 1" :chapter="chapter"></chapter-one-header>
-    <belbin-header v-if="chapter != 1" :chapter="chapter"></belbin-header>
+    <belbin-header v-if="chapter != 1" :chapter="chapter" @openInstruction="openInstruction"></belbin-header>
+    <instruction v-if="instructOpen" @closeInstruction="closeInstruction"/>
     <test-belbin 
       class="main" 
       :chapter="chapter" 
@@ -25,10 +26,22 @@ import ChapterOneHeader from '@/components/belbin/chapter-one-header.vue';
 import TestBelbin from '@/components/belbin/test-belbin.vue';
 import BelbinFooter from '@/components/belbin/belbin-footer.vue';
 import BelbinHeader from '@/components/belbin/belbin-header.vue';
+import Instruction from '@/components/belbin/instruction.vue';
 
 const store = useDataStore();
 const isLoading = ref(false);
+const instructOpen = ref(false)
 
+
+function openInstruction() {
+  instructOpen.value = true;
+  document.body.classList.add('modal-open');
+}
+
+function closeInstruction() {
+  instructOpen.value = false;
+  document.body.classList.remove('modal-open');
+}
 
 onMounted(async () => {
   await store.fetchBelbin();

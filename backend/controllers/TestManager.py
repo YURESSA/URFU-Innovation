@@ -34,7 +34,6 @@ class TestManager:
             return cursor.fetchall()
 
     def get_roles_and_descriptions(self):
-        roles = {}
         with open(self.belbin_test, 'r', encoding='utf-8') as file:
             data = json.load(file)
 
@@ -43,7 +42,11 @@ class TestManager:
             section_name = role.get("section_name")
             roles[section_name] = {
                 "role_in_team": role.get("role_in_team"),
-                "description": role.get("description")
+                "description": role.get("description"),
+                "file_name": role.get("file_name"),
+                "strong-side": role.get("strong-side"),
+                "weak-side": role.get("weak-side"),
+                "recommendations": role.get("recommendations"),
             }
 
         return roles
@@ -113,7 +116,7 @@ class TestManager:
             JOIN users u ON u.user_id = ut.user_id
             JOIN user_answers ua ON ua.user_test_id = ut.user_test_id
             JOIN tests t ON t.test_id = ut.test_id
-            WHERE 1=1
+            ORDER BY ut.timestamp desc 
         '''
         params = []
 
@@ -137,7 +140,7 @@ class TestManager:
     @staticmethod
     def _parse_date(date_str):
         try:
-            return datetime.strptime(date_str, '%Y-%m-%d').strftime('%Y-%m-%d %H:%M:%S')
+            return datetime.strptime(date_str, '%Y-%m-%d').strftime('%Y-%m-%d %H:%M')
         except ValueError:
             return None
 
