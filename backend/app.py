@@ -89,7 +89,7 @@ def process_post_request():
     data_percentages = dict(sorted(data_percentages.items(), key=lambda item: item[1], reverse=True))
     top_result, bottom_result = get_tops_and_bottoms_sections(data_percentages)
     built_top_result = build_top_result(top_result, roles_data)
-    built_bottom_result = build_bottom_result(top_result, roles_data)
+    built_bottom_result = build_bottom_result(bottom_result, roles_data)
     test_manager.save_user_answers(user_test_id, data_percentages)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
 
@@ -158,7 +158,7 @@ def build_top_result(final_data, roles_data):
         if role_info:
             final_result.append({
                 'role': role_info['role_in_team'],
-                'strong-side': role_info['strong-side'],
+                'strong_side': role_info['strong-side'],
                 'value': value,
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
@@ -174,7 +174,7 @@ def build_bottom_result(final_data, roles_data):
             final_result.append({
                 'role': role_info['role_in_team'],
                 'value': value,
-                'weak-side': role_info['weak-side'],
+                'weak_side': role_info['weak-side'],
                 'recommendations': role_info['recommendations'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
@@ -238,7 +238,7 @@ def format_result_row(result):
     test_name = result.get('test_name')
     timestamp = result.get('timestamp')
     sections = result.get('sections')
-    sections_str = [str(i) for i in sections.values()]
+    sections_str = [int(i) for i in sections.values()]
     return [full_name, phone_number, telegram_id, test_name, timestamp] + sections_str
 
 
