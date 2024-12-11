@@ -10,7 +10,7 @@ from controllers.UserManager import UserManager
 app = Flask(__name__)
 allowed_origins = [
     "http://127.0.0.1:5000",
-    "http://localhost:5173"
+    "http://localhost:5174"
 ]
 app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
                   PERMANENT_SESSION_LIFETIME=86400)
@@ -238,7 +238,7 @@ def format_result_row(result):
     test_name = result.get('test_name')
     timestamp = result.get('timestamp')
     sections = result.get('sections')
-    sections_str = [str(i) for i in sections.values()]
+    sections_str = [float(i) for i in sections.values()]
     return [full_name, phone_number, telegram_id, test_name, timestamp] + sections_str
 
 
