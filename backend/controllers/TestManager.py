@@ -44,6 +44,9 @@ class TestManager:
                 "role_in_team": role.get("role_in_team"),
                 "description": role.get("description"),
                 "file_name": role.get("file_name"),
+                "strong-side": role.get("strong-side"),
+                "weak-side": role.get("weak-side"),
+                "recommendations": role.get("recommendations"),
             }
 
         return roles

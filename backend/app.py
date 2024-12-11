@@ -10,7 +10,7 @@ from controllers.UserManager import UserManager
 app = Flask(__name__)
 allowed_origins = [
     "http://127.0.0.1:5000",
-    "http://localhost:5174"
+    "http://localhost:5173"
 ]
 app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
                   PERMANENT_SESSION_LIFETIME=86400)
@@ -87,9 +87,9 @@ def process_post_request():
     roles_data = test_manager.get_roles_and_descriptions()
     data_percentages = calculate_percentages(result)
     data_percentages = dict(sorted(data_percentages.items(), key=lambda item: item[1], reverse=True))
-    final_data = get_top_two_sections(data_percentages)
-    final_result = build_final_result(final_data, roles_data)
-
+    top_result, bottom_result = get_tops_and_bottoms_sections(data_percentages)
+    built_top_result = build_top_result(top_result, roles_data)
+    built_bottom_result = build_bottom_result(top_result, roles_data)
     test_manager.save_user_answers(user_test_id, data_percentages)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
 
@@ -98,7 +98,8 @@ def process_post_request():
     return jsonify({
         "success": True,
         "message": "Форма успешно принята",
-        "prefer_roles": final_result,
+        "prefer_roles": built_top_result,
+        "un_prefer_roles": built_bottom_result,
         "all_roles": data_roles
     }), 200
 
@@ -126,14 +127,46 @@ def calculate_percentages(result):
     return {key: round((value / total_sum) * 100) for key, value in result.items()}
 
 
-def get_top_two_sections(data_percentages):
+def get_tops_and_bottoms_sections(data_percentages):
     filtered_data = {key: value for key, value in data_percentages.items() if value > 0}
-    sorted_values = sorted(set(filtered_data.values()), reverse=True)[:2]
-    top_two_values = set(sorted_values)
-    return {key: value for key, value in filtered_data.items() if value in top_two_values}
+    sorted_values = sorted(set(filtered_data.values()), reverse=True)
+    top_two_values = set(sorted_values[:2])
+    top_result = {key: value for key, value in filtered_data.items() if value in top_two_values}
+
+    if len(top_result) < 3:
+        top_two_values = set(sorted_values[:3])
+        top_result = {key: value for key, value in filtered_data.items() if value in top_two_values}
+
+    filtered_data = {key: value for key, value in filtered_data.items() if key not in top_result}
+    sorted_values_bottom = sorted(set(filtered_data.values()))
+    bottom_two_values = set(sorted_values_bottom[:2])
+    bottom_result = {key: value for key, value in filtered_data.items() if
+                     value in bottom_two_values and key not in top_result}
+
+    if len(bottom_result) < 3:
+        bottom_two_values = set(sorted_values_bottom[:3])
+        bottom_result = {key: value for key, value in filtered_data.items() if
+                         value in bottom_two_values and key not in top_result}
+
+    return top_result, bottom_result
 
 
-def build_final_result(final_data, roles_data):
+def build_top_result(final_data, roles_data):
+    final_result = []
+    for section, value in final_data.items():
+        role_info = roles_data.get(section)
+        if role_info:
+            final_result.append({
+                'role': role_info['role_in_team'],
+                'strong-side': role_info['strong-side'],
+                'value': value,
+                'description': role_info['description'],
+                'file_name': role_info['file_name']
+            })
+    return final_result
+
+
+def build_bottom_result(final_data, roles_data):
     final_result = []
     for section, value in final_data.items():
         role_info = roles_data.get(section)
@@ -141,6 +174,8 @@ def build_final_result(final_data, roles_data):
             final_result.append({
                 'role': role_info['role_in_team'],
                 'value': value,
+                'weak-side': role_info['weak-side'],
+                'recommendations': role_info['recommendations'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
             })
