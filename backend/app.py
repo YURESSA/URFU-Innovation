@@ -8,10 +8,8 @@ from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__)
-allowed_origins = [
-    "http://127.0.0.1:5000",
-    "http://localhost:5174"
-]
+allowed_origins = ["*"]
+
 app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
                   PERMANENT_SESSION_LIFETIME=86400)
 
