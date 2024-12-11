@@ -1,15 +1,21 @@
 @font-face {
   font-family: 'INNOURFU';
-  src: url('/dist/fonts/URFU.TTF');
+  src: url('/fonts/URFU.TTF');
 }
 
 @font-face {
   font-family: 'PF Bulletin Sans Pro';
-  src: url('/dist/fonts/PFBulletinSansPro-Regular.ttf');
+  src: url('/fonts/PFBulletinSansPro-Black.ttf');
+}
+
+@font-face {
+  font-family: 'PF Bulletin Sans Pro Regular';
+  src: url('/fonts/PFBulletinSansPro-Regular.ttf');
 }
 
 :root {
   --font-family: 'PF Bulletin Sans Pro', sans-serif;
+  --font-family-regular: 'PF Bulletin Sans Pro Regular', sans-serif;
   --second-family: 'INNOURFU', sans-serif;
 }
 
@@ -17,6 +23,7 @@ body {
   color: #2b2a28;
   font-size: 16px;
   overflow-x: hidden;
+  font-family: var(--font-family-regular);
 }
 
 a{
@@ -87,13 +94,26 @@ h5.second{
 }
 
 span{
-  font-family: var(--font-family);
+  font-family: var(--font-family-regular);
   font-weight: 500;
-  font-size: 21px;
   color: #2b2a28;
 }
 
 p{
+  font-family: var(--font-family-regular);
+  font-weight: 200;
+  font-size: 16px;
+  color: #2b2a28;
+}
+
+/* li{
+  font-family: var(--font-family-regular);
+  font-weight: 200;
+  font-size: 16px;
+  color: #2b2a28;
+} */
+
+.p__bold{
   font-family: var(--font-family);
   font-weight: 200;
   font-size: 16px;

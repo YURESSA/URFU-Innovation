@@ -56,7 +56,13 @@ button{
   width: 20%;
   height: 30%;
   background-color: #57c0cf;
+  color: black;
+  justify-content: center;
   margin-bottom: -25px;
+}
+
+button:hover{
+  background-color: #7EEBFB;
 }
 
 @media screen and (max-width: 980px) {

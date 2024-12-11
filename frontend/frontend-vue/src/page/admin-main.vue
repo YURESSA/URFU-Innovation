@@ -94,7 +94,7 @@ console.log(dataBase.value)
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  background-color: rgb(0, 77, 77);
+  background-color: rgb(231, 231, 231);
 }
 
 .modal__wrapper{

@@ -3,7 +3,7 @@
 @media screen and (max-width: 980px){
   #app {
     max-width: 95%;
-    margin: 1000px;
+    /* margin: 1000px; */
     font-weight: normal;
   }
 }
@@ -20,10 +20,62 @@ body {
 }
 
 thead > tr{
-  background-color: rgb(123, 221, 221);
+  background-color: rgb(255, 255, 255);
 }
 
 
 .modal-open{
   overflow: hidden;
+}
+
+.p-datatable-thead > tr > th.p-datatable-header-cell, .p-datatable-tbody > tr > td {
+  padding: 8px 12px !important;
+  box-sizing: border-box;
+}
+
+.p-datatable-header-cell, .p-datatable-tbody > tr > td {
+  border-color: #d7e6e6 !important;
+  border-bottom-width: 2px !important;
+}
+
+th:first-child {
+  width: 140px !important;
+  max-width: 140px;
+}
+
+td {
+  font-size: 16px;
+}
+
+td:not(:nth-child(2)) {
+  word-wrap: break-word;
+  text-align: start;
+  vertical-align: top;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  gap: 2px;
+  border: none;
+  border-radius: 10px;
+  background-color: #0a4e4e;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: whitesmoke;
+  transition: all 0.25s ease;
+}
+
+button.icon-btn {
+  padding-left: 10px;
+}
+
+button img {
+  position: relative;
+  top: -1px;
+}
+
+button:hover{
+  background-color: #275f5f;
 }

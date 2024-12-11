@@ -2,7 +2,8 @@
   <header>
     <div class="interaction">
       <button @click="emit('openForm')">Добавить нового администратора</button>
-      <button @click="logout">Выйти <img src="/src/assets/admin/exit-svg.svg"></button>
+
+      <button @click="logout" class="icon-btn"><img src="/src/assets/admin/exit-svg.svg">Выйти</button>
     </div>
   </header>
 </template>
@@ -43,18 +44,4 @@ header{
   max-width: max-content;
 }
 
-button {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  gap: 10px;
-  border: 0.50px solid #2b2a28;
-  border-radius: 7px;
-  background-color: #4597a3;
-  padding: 10px 25px;
-}
-
-button:hover{
-  background-color: #35818d;
-}
 </style>

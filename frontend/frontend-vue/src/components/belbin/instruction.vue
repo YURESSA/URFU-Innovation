@@ -25,7 +25,7 @@ const emit = defineEmits(['closeInstruction'])
 
 <style scoped>
 .instruction__wrapper{
-  position: absolute;
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -55,6 +55,9 @@ const emit = defineEmits(['closeInstruction'])
 }
 
 .close-instruction{
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 40px;
   height: 40px;
   position: absolute;

@@ -22,7 +22,7 @@
           required
           @input="validateTelegramId">
           <div class="approval">
-            <input type="checkbox" class="checkbox" required ><p> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf">обработку введенной персональной информации</a></p>
+            <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf">обработку введенной персональной информации</a></p>
           </div>
           <button ref="sumbitButton" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
           <p v-if="!validNumber || !validTelegram" class="error">{{ errorMessage }}</p>
@@ -195,6 +195,9 @@ button:disabled{
 }
 
 .close-form{
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 40px;
   height: 40px;
   position: absolute;

@@ -5,12 +5,39 @@
       <img src="/src/assets/belbin/Arrow 1.svg" alt="">
     </div>
     <div class="top-roles">
-      <div class="role" v-for="(item, i) in data" :key="i">
+      <div class="role" v-for="(item, i) in data.prefer_roles" :key="i">
         <div class="name">
           <h5 class="second">{{ item.role }}</h5>
           <img :src="`/src/assets/belbin-result/${item.file_name}`" alt="">
         </div>
-        <p>{{ item.description }}</p>
+        <div class="info-role">
+          <h5>Описание</h5>
+          <p>{{ item.description }}</p>
+          <h5>Сильные стороны</h5>
+          <p>{{ item.strong_side }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="title">
+      <h4 class="font">Ваши слабые роли</h4>
+      <img src="/src/assets/belbin/Arrow 1.svg" alt="">
+    </div>
+    <div class="non-top-roles">
+      <div class="role" v-for="(item, i) in data.un_prefer_roles" :key="i">
+        <div class="name">
+          <h5 class="second">{{ item.role }}</h5>
+          <img :src="`/src/assets/belbin-result/${item.file_name}`" alt="">
+        </div>
+        <div class="info-role">
+          <h5>Описание</h5>
+          <p>{{ item.description }}</p>
+          <h5>Слабые стороны</h5>
+          <p>{{ item.weak_side }}</p>
+          <h5>Рекомендации для развития</h5>
+          <ul>
+            <li v-for="(recomend, i) in item.recommendations" :key="i"> {{ recomend }} </li>
+          </ul>
+        </div>
       </div>
     </div>
   </main>
@@ -20,8 +47,10 @@
 import { defineProps } from 'vue';
 
 const props = defineProps({
-  data: Array,
+  data: Object,
 })
+
+console.log(props.data)
 </script>
 
 <style scoped>
@@ -55,12 +84,12 @@ main{
   color: #57c0cf;
 }
 
-.top-roles{
+.top-roles, .non-top-roles{
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 80%;
-  gap: 40px;
+  gap: 100px;
 }
 
 .role{
@@ -89,7 +118,22 @@ main{
 
 .role p{
   max-width: 417px;
-  min-height: 190px;
+  /* min-height: 190px; */
+}
+
+li{
+  max-width: 417px;
+}
+
+.info-role{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-role > h5{
+  font-weight: 600;
+  font-size: 30px;
 }
 
 h4{
@@ -97,6 +141,12 @@ h4{
 }
 
 @media screen and (max-width: 980px) {
+  main{
+    width: 100%;
+  }
+  h4{
+    font-size: 32px;
+  }
   .title > img{
     display: none;
   }

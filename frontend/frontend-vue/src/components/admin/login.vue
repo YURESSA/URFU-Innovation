@@ -66,6 +66,7 @@ function submitData(event){
 form{
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 30px;
 }
 
@@ -86,6 +87,8 @@ button {
   background-color: #35818d;
   margin-top: 60px;
   padding: 10px 25px;
+  justify-content: center;
+  width: 300px;
 }
 
 button:hover {

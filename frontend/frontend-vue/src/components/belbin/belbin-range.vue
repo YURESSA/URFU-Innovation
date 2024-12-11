@@ -52,19 +52,16 @@ watch(
 );
 
 watch(limitRef, (newValue) => {
-  console.log('Я тут', newValue)
   if (slider.value) {
     let gradientValue;
     if (newValue == 9 || newValue == 8) {
       gradientValue = `${newValue * 10 - 1}%`;
-      console.log(gradientValue)
     } else if (newValue == 2 || newValue == 1) {
       gradientValue = `${newValue * 10 + 1}%`;
     } else {
       gradientValue = `${newValue * 10}%`;
     }
     slider.value.style.background = `linear-gradient(to right, #57C0CF ${gradientValue}, #a6a6a6 0%)`;
-    console.log('Я и тут', slider.value.style.background)
   }
 });
 
