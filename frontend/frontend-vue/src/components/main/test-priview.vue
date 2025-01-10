@@ -54,5 +54,8 @@ h2{
   .star{
     width: 150px;
   }
+  .test{
+    width: 250px;
+  }
 }
 </style>
