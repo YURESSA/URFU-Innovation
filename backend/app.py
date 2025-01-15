@@ -15,9 +15,17 @@ app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESS
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
 app.secret_key = 'URFU-INNOVATE-2024'
-admin_manager = AdminManager()
-user_manager = UserManager()
-test_manager = TestManager()
+deploy = True
+if deploy:
+    db_path = '/home/urfuinnovate/URFU-Innovation/backend/data/innovate.db3'
+    belbin_test = '/home/urfuinnovate/URFU-Innovation/backend/data/belbin/belbin.json'
+    admin_manager = AdminManager(db_path)
+    user_manager = UserManager(db_path)
+    test_manager = TestManager(db_path, belbin_test)
+else:
+    admin_manager = AdminManager()
+    user_manager = UserManager()
+    test_manager = TestManager()
 
 
 @app.route('/api/register-user', methods=['POST'])
