@@ -15,7 +15,7 @@ app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESS
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
 app.secret_key = 'URFU-INNOVATE-2024'
-deploy = True
+deploy = False
 if deploy:
     db_path = '/home/urfuinnovate/URFU-Innovation/backend/data/innovate.db3'
     belbin_test = '/home/urfuinnovate/URFU-Innovation/backend/data/belbin/belbin.json'
