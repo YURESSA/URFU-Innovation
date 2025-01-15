@@ -1,13 +1,13 @@
 from io import BytesIO
 from openpyxl.utils import get_column_letter
 import openpyxl
-from flask import Flask, request, jsonify, session, send_file
+from flask import Flask, request, jsonify, session, send_file, render_template
 from flask_cors import CORS
 from controllers.AdminManager import AdminManager
 from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 allowed_origins = ["*"]
 
 app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
@@ -135,7 +135,7 @@ def get_tops_and_bottoms_sections(data_percentages):
         top_two_values = set(sorted_values[:3])
         top_result = {key: value for key, value in filtered_data.items() if value in top_two_values}
 
-    filtered_data = {key: value for key, value in filtered_data.items() if key not in top_result}
+    filtered_data = {key: value for key, value in data_percentages.items() if key not in top_result.keys()}
     sorted_values_bottom = sorted(set(filtered_data.values()))
     bottom_two_values = set(sorted_values_bottom[:2])
     bottom_result = {key: value for key, value in filtered_data.items() if
@@ -193,7 +193,6 @@ def get_test_results():
         return jsonify({"success": False, "message": "Только администратторы могут выполнять данное действие!"}), 403
 
     results = test_manager.get_filtered_results(telegram_id, test_name, start_date, end_date)
-
     return jsonify({"success": True, "results": results}), 200
 
 
@@ -340,6 +339,12 @@ def promote_to_super_admin():
     is_success, message = admin_manager.promote_to_super_admin(current_user, username)
     code = 200 if is_success else 403
     return jsonify({"success": is_success, "message": message}), code
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
+    return render_template('index.html')
 
 
 if __name__ == '__main__':

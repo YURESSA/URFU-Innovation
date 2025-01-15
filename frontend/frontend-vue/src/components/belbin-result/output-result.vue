@@ -54,7 +54,7 @@ console.log(props.data)
 </script>
 
 <style scoped>
-main{
+main {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -63,7 +63,7 @@ main{
   margin: 0 auto;
 }
 
-.title{
+.title {
   display: flex;
   align-items: center;
   margin-bottom: 45px;
@@ -71,20 +71,20 @@ main{
   gap: 30px;
 }
 
-.title img{
+.title img {
   padding-top: 20px;
 }
 
-.font{
+.font {
   text-align: center;
   font-weight: 900;
 }
 
-.second{
+.second {
   color: #57c0cf;
 }
 
-.top-roles, .non-top-roles{
+.top-roles, .non-top-roles {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -92,65 +92,68 @@ main{
   gap: 100px;
 }
 
-.role{
+.role {
   display: flex;
   gap: 60px;
 }
 
-.name{ 
+.name {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 20px;
 }
 
-.name > img{
+.name > img {
   width: 250px;
   height: 300px;
 }
 
-.role .name{
+.role .name {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   min-width: 300px;
 }
 
-.role p{
+.role p {
   max-width: 417px;
   /* min-height: 190px; */
 }
 
-li{
+li {
   max-width: 417px;
 }
 
-.info-role{
+.info-role {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.info-role > h5{
+.info-role > h5 {
   font-weight: 600;
   font-size: 30px;
 }
 
-h4{
+h4 {
   width: max-content;
 }
 
 @media screen and (max-width: 980px) {
-  main{
+  main {
     width: 100%;
   }
-  h4{
+
+  h4 {
     font-size: 32px;
   }
-  .title > img{
+
+  .title > img {
     display: none;
   }
-  .role{
+
+  .role {
     flex-direction: column;
     align-items: center;
     gap: 10px;
