@@ -82,7 +82,7 @@ button:disabled{
 
 @media screen and (max-width: 980px) {
   .footer__wrapper{
-    width: 75%;
+    width: 80%;
     align-items: center;
   }
   button{

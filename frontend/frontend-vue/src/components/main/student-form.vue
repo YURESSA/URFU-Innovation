@@ -1,7 +1,7 @@
 <template>
   <div class="form__wrapper">
     <div class="relative__wrapper">
-      <button class="close-form" @click="emit('closeForm')"><img src="/src/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
+      <button class="close-form" @click="emit('closeForm')"><img src="@public/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
       <div class="form">
         <h3>Заполните данные</h3>
         <form ref="studentForm" method="post" @submit="handleSubmit">
@@ -22,7 +22,7 @@
           required
           @input="validateTelegramId">
           <div class="approval">
-            <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf">обработку введенной персональной информации</a></p>
+            <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf" target="_blank">обработку введенной персональной информации</a></p>
           </div>
           <button ref="sumbitButton" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
           <p v-if="!validNumber || !validTelegram" class="error">{{ errorMessage }}</p>

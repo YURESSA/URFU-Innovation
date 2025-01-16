@@ -61,7 +61,7 @@ watch(limitRef, (newValue) => {
     } else {
       gradientValue = `${newValue * 10}%`;
     }
-    slider.value.style.background = `linear-gradient(to right, #57C0CF ${gradientValue}, #a6a6a6 0%)`;
+    slider.value.style.background = `linear-gradient(to right, #57C0CF ${gradientValue}, #c2c2c2 0%)`;
   }
 });
 
@@ -91,7 +91,6 @@ function onInput(e){
   width: 25px;
   height: 25px;
   background: #57c0cf;
-  border: 1px solid #2b2a28;
   cursor: pointer;
   border-radius: 50%;
   margin-top: -11px;
