@@ -6,7 +6,7 @@
       </div>
       <div class="logo">
         <img src="@public/assets/belbin/line1.svg" class="line1" alt="">
-        <img src="@public/assets/main-page/logo.svg" class="urfu" alt="">
+        <a href="/"><img src="@public/assets/main-page/logo.svg" class="urfu" alt=""></a>
         <img src="@public/assets/belbin/line2.svg" class="line2" alt="">
       </div>
     </div>
@@ -112,19 +112,18 @@ span{
     width: 95px;
     height: 140px;
     top: -80px;
-    left: 180px;
+    left: 150px;
   }
   .line2{
     width: 100px;
     height: 85px;
     top: 15px;
-    left: 250px;
+    left: 220px;
   }
   .urfu{
-    width: 70px;
-    height: 40px;
+    width: 97px;
     top: -60px;
-    left: 280px;
+    left: 242px;
   }
   h4{
     font-size: 24px;

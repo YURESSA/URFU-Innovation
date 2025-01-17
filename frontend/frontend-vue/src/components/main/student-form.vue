@@ -1,6 +1,6 @@
 <template>
-  <div class="form__wrapper">
-    <div class="relative__wrapper">
+  <div class="form__wrapper" @click="emit('closeForm')">
+    <div class="relative__wrapper" @click.stop>
       <button class="close-form" @click="emit('closeForm')"><img src="@public/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
       <div class="form">
         <h3>Заполните данные</h3>
@@ -119,7 +119,6 @@ function handleSubmit(event) {
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 10;
 
   background-color: rgba(0, 0, 0, 0.8);
 }

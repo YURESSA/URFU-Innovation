@@ -316,8 +316,9 @@ def logout():
 
 @app.route('/api/delete_admin', methods=['DELETE'])
 def delete_admin():
-    data = request.form
+    data = request.json
     username = data.get('username')
+    print(data)
     current_user = session.get('admin_username')
     is_success, message = admin_manager.delete_admin(current_user, username)
     code = 200 if is_success else 403
@@ -327,7 +328,6 @@ def delete_admin():
 @app.route('/api/admins', methods=['GET'])
 def get_all_admins():
     current_user = session.get('admin_username')
-
     is_success, result = admin_manager.get_all_admins(current_user)
     if not is_success:
         return jsonify({"success": False, "message": result}), 403 if "Только супер-администраторы" in result else 401
@@ -335,13 +335,13 @@ def get_all_admins():
     return jsonify({"success": True, "admins": result}), 200
 
 
-@app.route('/api/promote-to-super-admin', methods=['POST'])
+@app.route('/api/promote-to-super-admin', methods=['DELETE'])
 def promote_to_super_admin():
     current_user = session.get('admin_username')
     if not current_user:
         return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
 
-    data = request.form
+    data = request.json
     username = data.get('username')
 
     is_success, message = admin_manager.promote_to_super_admin(current_user, username)
