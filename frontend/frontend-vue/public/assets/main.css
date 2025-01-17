@@ -43,6 +43,10 @@ th:first-child {
   max-width: 140px;
 }
 
+.apexcharts-toolbar{
+  right: 40%!important;
+}
+
 td {
   font-size: 16px;
 }

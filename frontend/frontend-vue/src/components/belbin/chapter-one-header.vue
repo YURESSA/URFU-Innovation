@@ -6,7 +6,7 @@
       </div>
       <div class="logo">
         <img src="@public/assets/belbin/line1.svg" class="line1" alt="">
-        <img src="@public/assets/main-page/логотип ИИ 1.svg" class="urfu" alt="">
+        <img src="@public/assets/main-page/logo.svg" class="urfu" alt="">
         <img src="@public/assets/belbin/line2.svg" class="line2" alt="">
       </div>
     </div>

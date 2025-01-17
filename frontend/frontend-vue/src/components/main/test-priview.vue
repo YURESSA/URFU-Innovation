@@ -1,7 +1,8 @@
 <template>
   <div class="test">
+    <img src="@public/assets/main-page/belbin-preview.svg" class="test-img" alt="">
     <h2>{{ title }}</h2>
-    <img src="@public/assets/main-page/star.svg" class="star" alt="Star" />
+    <img src="@public/assets/main-page/star2.svg" class="star" alt="Star" />
   </div>
 </template>
 
@@ -16,38 +17,51 @@ const props = defineProps({
   display: flex;
   justify-content: left;
   align-items: center;
-  background-color: #4dcac8;
-  border: 1px solid #2b2a28;
+  background-color: #67DDDC;
   border-radius: 7px;
   width: 300px;
   height: 180px;
   padding: 27px 31px;
   position: relative;
   cursor: pointer;
-  transition: 0.5s all;
+  transition: 0.5s all ease;
+}
+
+.test-img{
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: 0.5s all ease;
 }
 
 .test:hover{
-  background-color: #c7c7c7;
-  background-image: url('@public/assets/main-page/belbin-preview.svg');
-  background-size: cover;
+  background-color: rgb(92, 245, 242);
+}
+
+.test:hover .test-img{
+  opacity: 1;
 }
 
 .test:hover h2, 
 .test:hover .star{
-  display: none;
+  opacity: 0;
 }
 
 h2{
   font-size: 64px;
   font-weight: 500;
   width: 100px;
+  transition: 0.3s all ease;
 }
 
 .star {
   position: absolute;
   top: 0px;
   right: 0px;
+  transition: 0.3s all ease;
+  height: 150px;
 }
 
 @media screen and (max-width: 980px) {

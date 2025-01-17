@@ -26,7 +26,6 @@ export const useDataStore = defineStore('data', {
                     withCredentials: true,
                 }); // получаю вопросы теста
                 this.belbin = response.data;
-                console.log('Данные загрузил');
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }
@@ -37,7 +36,6 @@ export const useDataStore = defineStore('data', {
                     withCredentials: true,
                 }); // получаю результаты теста Белбина
                 this.belbinResult = response.data;
-                console.log('Данные загрузил');
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }
@@ -48,7 +46,6 @@ export const useDataStore = defineStore('data', {
                     withCredentials: true,
                 });
                 this.dataBase = response.data;
-                console.log('Данные получены')
             } catch (error){
                 console.log('Ошибка при получении данных:', error)
                 throw error;

@@ -83,7 +83,6 @@ onMounted(async () => {
 });
 
 const dataBase = computed(() => store.getDataBase.results);
-console.log(dataBase.value)
 </script>
 
 <style scoped>

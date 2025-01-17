@@ -16,7 +16,6 @@ import OutputResult from '@/components/belbin-result/output-result.vue';
 
 const store = useDataStore();
 const result = computed(() => store.getBelbinResult);
-console.log(result.value)
 
 const diagresult = Object.entries(result.value.all_roles).map(([key, value]) => ({
       name: key,
@@ -47,7 +46,7 @@ a{
 
 @media screen and (max-width: 980px) {
   p{
-    max-width: 350px;
+    max-width: 260px;
   }
 }
 

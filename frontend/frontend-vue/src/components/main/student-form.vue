@@ -97,7 +97,6 @@ function handleSubmit(event) {
     withCredentials: true,
   })
       .then(response => {
-        console.log('Данные успешно отправлены!');
         router.push(props.testUrl);
       })
       .catch(error => {
@@ -134,6 +133,7 @@ function handleSubmit(event) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 40px;
   padding: 60px 60px;
 
@@ -192,6 +192,8 @@ button:disabled{
   font-weight: 600;
   color: brown;
   margin: 0;
+  position: absolute;
+  bottom: 25px;
 }
 
 .close-form{
@@ -221,6 +223,10 @@ button:disabled{
     margin-right: 25px;
     padding: 20px 40px;
     height: 580px;
+    gap: 20px;
+  }
+  form{
+    transform: translateY(10%);
   }
   .close-form{
     top: 10px;
@@ -228,6 +234,14 @@ button:disabled{
   } 
   input{
     font-size: 14px;
+    height: 34px;
+  }
+  h3{
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-55%);
+    width: max-content;
   }
 }
 </style>

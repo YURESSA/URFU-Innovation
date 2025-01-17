@@ -32,7 +32,6 @@ function submitData(event){
     withCredentials: true,
   })
   .then(response => {
-    console.log('Вход выполнен');
     router.push('/admin/database');
   })
   .catch(error =>{

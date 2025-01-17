@@ -49,8 +49,6 @@ import { defineProps } from 'vue';
 const props = defineProps({
   data: Object,
 })
-
-console.log(props.data)
 </script>
 
 <style scoped>
