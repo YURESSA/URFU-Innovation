@@ -1,6 +1,6 @@
 <template>
-  <div class="instruction__wrapper">
-    <div class="relative__wrapper">
+  <div class="instruction__wrapper" @click="emit('closeInstruction')" >
+    <div class="relative__wrapper" @click.stop>
       <button class="close-instruction" @click="emit('closeInstruction')"><img src="@public/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
       <div class="instryction">
         <h4>Инструкция</h4>

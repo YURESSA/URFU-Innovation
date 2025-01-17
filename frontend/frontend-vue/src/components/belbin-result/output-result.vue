@@ -8,7 +8,7 @@
       <div class="role" v-for="(item, i) in data.prefer_roles" :key="i">
         <div class="name">
           <h5 class="second">{{ item.role }}</h5>
-          <img :src="`/public/assets/belbin-result/${item.file_name}`" alt="">
+          <img :src="`/static/assets/belbin-result/${item.file_name}`" alt="">
         </div>
         <div class="info-role">
           <h5>Описание</h5>
@@ -26,7 +26,7 @@
       <div class="role" v-for="(item, i) in data.un_prefer_roles" :key="i">
         <div class="name">
           <h5 class="second">{{ item.role }}</h5>
-          <img :src="`/public/assets/belbin-result/${item.file_name}`" alt="">
+          <img :src="`/static/assets/belbin-result/${item.file_name}`" alt="">
         </div>
         <div class="info-role">
           <h5>Описание</h5>

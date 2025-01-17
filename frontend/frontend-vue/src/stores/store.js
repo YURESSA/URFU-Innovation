@@ -10,6 +10,7 @@ export const useDataStore = defineStore('data', {
         belbin: [],
         belbinResult: [],
         dataBase: [],
+        admins: [],
     }),
     actions: {
         async fetchTests() {
@@ -50,13 +51,47 @@ export const useDataStore = defineStore('data', {
                 console.log('Ошибка при получении данных:', error)
                 throw error;
             }
-        }
+        },
+        async fetchAdmins() {
+            try{
+                const response = await axios.get(`${baseUrl}/api/admins`, {
+                    withCredentials: true,
+                });
+                this.admins = response.data;
+            } catch (error){
+                console.log('Ошибка при получении данных:', error)
+                throw error;
+            }
+        },
+        async fetchDeletAdmin(username) {
+            try {
+                const response = await axios.delete(`${baseUrl}/api/delete_admin`, {
+                    data: { username },
+                    withCredentials: true,
+                });
+                console.log('Ответ сервера:', response.data);
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+            }
+        },
+        async TransferSuperAdmin(username) {
+            try {
+                const response = await axios.delete(`${baseUrl}/api/promote-to-super-admin`, {
+                    data: { username },
+                    withCredentials: true,
+                }); 
+                console.log(response.data)
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+            }
+        },
     },
     getters: {
         getTests: (state) => state.tests,
         getBelbin: (state) => state.belbin,
         getBelbinResult: (state) => state.belbinResult,
-        getDataBase: (state) => state.dataBase
+        getDataBase: (state) => state.dataBase,
+        getAdmins: (state) => state.admins
     },
     persist: {
         key: 'data-store',

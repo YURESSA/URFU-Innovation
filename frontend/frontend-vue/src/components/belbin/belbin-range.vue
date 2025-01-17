@@ -9,7 +9,8 @@
           :class="{
             'mobile-start-label-value': num >= 0 && num <= 3,
             'mobile-mid-label-value': num >= 6 && num <= 8,
-            'mobile-end-label-value': num >= 9 && num <= 10
+            'mobile-end-label-value': num >= 9 && num <= 10,
+            'mobile-last-label-value': num-1 == 10,
           }"
         >
           <span class="slider-value">{{ dataV }}</span>
@@ -119,11 +120,18 @@ const updateSliderValue = () => {
   const label = labelsMark.value[dataV.value];
   const labelValue = valueLabel.value[dataV.value]
   const numberNow = parseInt(labelValue.innerHTML.trim());
-  if(numberNow > lastNumber.value){
-    labelValue.style.fontWeight = '600'
+  if (numberNow > lastNumber.value) {
+    for (let i = 0; i <= numberNow; i++) {
+      if (valueLabel.value[i]) {
+        valueLabel.value[i].style.fontWeight = '600';
+      }
+    }
   } else {
-    labelValue.style.fontWeight = '500'
-    valueLabel.value[dataV.value+1].style.fontWeight = '500'
+    for (let i = numberNow; i <= lastNumber.value; i++) {
+      if (valueLabel.value[i]) {
+        valueLabel.value[i].style.fontWeight = '500';
+      }
+    }
   }
   if (label) {
     label.classList.add('label-active');
@@ -170,10 +178,6 @@ function onInput(e){
   width: 100%;
 }
 
-.bold{ 
-  font-weight: 600;
-}
-
 .slider-value__wrapper{
   position: absolute;
   top: -37px;
@@ -209,8 +213,8 @@ function onInput(e){
   margin-top: -6px;
   box-shadow: 0px 0px 0px 6px rgba(53, 151, 167, 0.16);
   transition: box-shadow 0.3s ease;
-  position: relative; /* Чтобы задать контекст позиционирования */
-  z-index: 10; /* Убедитесь, что значение z-index достаточно высокое */
+  position: relative;
+  z-index: 5;
 }
 
 .slider-active::-webkit-slider-thumb{
@@ -222,6 +226,10 @@ function onInput(e){
   height: 4px;
   background: none;
   border-radius: 5px;
+}
+
+.bold{
+  font-weight: 600!important;
 }
 
 .slider-labels {
@@ -251,7 +259,7 @@ function onInput(e){
   .slider::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
-    margin-top: -7px;
+    margin-top: -10px;
   }
   .slider::-webkit-slider-runnable-track {
     width: 100%;
@@ -261,13 +269,16 @@ function onInput(e){
     padding-left: 3%;
   }
   .mobile-start-label-value{
-    left: -9px;
+    left: -8px;
   }
   .mobile-mid-label-value{
     left: -17px;
   }
   .mobile-end-label-value{
     left: -20px;
+  }
+  .mobile-last-label-value{
+    left: -22px;
   }
 }
 </style>

@@ -2,7 +2,7 @@
   <header>
     <div class="interaction">
       <button @click="emit('openForm')">Добавить нового администратора</button>
-
+      <button @click="emit('openList')">Список администраторов</button>
       <button @click="logout" class="icon-btn"><img src="@public/assets/admin/exit-svg.svg">Выйти</button>
     </div>
   </header>
@@ -13,11 +13,10 @@ import { defineEmits } from 'vue';
 import axios from 'axios';
 import { baseUrl } from '@/stores/store';
 import {useRouter} from 'vue-router';
-import Cookies from 'js-cookie';
 
 const router = useRouter();
 
-const emit = defineEmits(['openForm'])
+const emit = defineEmits(['openForm', 'openList'])
 
 const logout = () =>{
   axios.get(`${baseUrl}/api/logout`, {

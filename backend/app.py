@@ -335,13 +335,13 @@ def get_all_admins():
     return jsonify({"success": True, "admins": result}), 200
 
 
-@app.route('/api/promote-to-super-admin', methods=['POST'])
+@app.route('/api/promote-to-super-admin', methods=['DELETE'])
 def promote_to_super_admin():
     current_user = session.get('admin_username')
     if not current_user:
         return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
 
-    data = request.form
+    data = request.json
     username = data.get('username')
 
     is_success, message = admin_manager.promote_to_super_admin(current_user, username)
