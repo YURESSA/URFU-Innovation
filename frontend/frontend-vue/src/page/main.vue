@@ -7,8 +7,8 @@
           <h2>предпринимательских <br> компетенций</h2>
         </div>
         <div class="logo">
-          <img src="../assets/main-page/элемент-линии.svg" class="line" alt="" />
-          <img src="../assets/main-page/логотип ИИ 1.svg" class="urfu" alt="инновационная инфраструктура УрФУ"/>
+          <img src="@public/assets/main-page/элемент-линии.svg" class="line" alt="" />
+          <img src="@public/assets/main-page/логотип ИИ 1.svg" class="urfu" alt="инновационная инфраструктура УрФУ"/>
         </div>
       </div>
     </header>
@@ -109,7 +109,7 @@ main{
     flex-direction: column-reverse;
   }
   .logo{
-    left: 0px;
+    left: -10px;
     top: 0px;
   }
   .line{

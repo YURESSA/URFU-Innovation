@@ -3,7 +3,7 @@
     <div class="interaction">
       <button @click="emit('openForm')">Добавить нового администратора</button>
 
-      <button @click="logout" class="icon-btn"><img src="/src/assets/admin/exit-svg.svg">Выйти</button>
+      <button @click="logout" class="icon-btn"><img src="@public/assets/admin/exit-svg.svg">Выйти</button>
     </div>
   </header>
 </template>

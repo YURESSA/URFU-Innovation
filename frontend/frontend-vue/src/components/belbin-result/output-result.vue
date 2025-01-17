@@ -2,13 +2,13 @@
   <main>
     <div class="title">
       <h4 class="font">Ваши сильные роли</h4>
-      <img src="/src/assets/belbin/Arrow 1.svg" alt="">
+      <img src="/public/assets/belbin/Arrow 1.svg" alt="">
     </div>
     <div class="top-roles">
       <div class="role" v-for="(item, i) in data.prefer_roles" :key="i">
         <div class="name">
           <h5 class="second">{{ item.role }}</h5>
-          <img :src="`/src/assets/belbin-result/${item.file_name}`" alt="">
+          <img :src="`/public/assets/belbin-result/${item.file_name}`" alt="">
         </div>
         <div class="info-role">
           <h5>Описание</h5>
@@ -20,13 +20,13 @@
     </div>
     <div class="title">
       <h4 class="font">Ваши слабые роли</h4>
-      <img src="/src/assets/belbin/Arrow 1.svg" alt="">
+      <img src="/public/assets/belbin/Arrow 1.svg" alt="">
     </div>
     <div class="non-top-roles">
       <div class="role" v-for="(item, i) in data.un_prefer_roles" :key="i">
         <div class="name">
           <h5 class="second">{{ item.role }}</h5>
-          <img :src="`/src/assets/belbin-result/${item.file_name}`" alt="">
+          <img :src="`/public/assets/belbin-result/${item.file_name}`" alt="">
         </div>
         <div class="info-role">
           <h5>Описание</h5>

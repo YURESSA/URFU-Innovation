@@ -5,9 +5,9 @@
         <h1>Тест <br> Белбина</h1>
       </div>
       <div class="logo">
-        <img src="/src/assets/belbin/line1.svg" class="line1" alt="">
-        <img src="/src/assets/main-page/логотип ИИ 1.svg" class="urfu" alt="">
-        <img src="/src/assets/belbin/line2.svg" class="line2" alt="">
+        <img src="@public/assets/belbin/line1.svg" class="line1" alt="">
+        <img src="@public/assets/main-page/логотип ИИ 1.svg" class="urfu" alt="">
+        <img src="@public/assets/belbin/line2.svg" class="line2" alt="">
       </div>
     </div>
     <div class="description">

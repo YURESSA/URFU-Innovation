@@ -1,7 +1,7 @@
 <template>
   <div class="test">
     <h2>{{ title }}</h2>
-    <img src="/src/assets/main-page/star.svg" class="star" alt="Star" />
+    <img src="@public/assets/main-page/star.svg" class="star" alt="Star" />
   </div>
 </template>
 
@@ -29,7 +29,7 @@ const props = defineProps({
 
 .test:hover{
   background-color: #c7c7c7;
-  background-image: url('/src/assets/main-page/belbin-preview.svg');
+  background-image: url('@public/assets/main-page/belbin-preview.svg');
   background-size: cover;
 }
 
@@ -53,6 +53,9 @@ h2{
 @media screen and (max-width: 980px) {
   .star{
     width: 150px;
+  }
+  .test{
+    width: 250px;
   }
 }
 </style>
