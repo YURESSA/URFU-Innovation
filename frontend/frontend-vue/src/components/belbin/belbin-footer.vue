@@ -38,7 +38,6 @@ const submitData = async () => {
   emit('updateResult')
   try {
     await store.fetchBelbinResult(props.result)
-    console.log('Ответ от сервера:', store.getBelbinResult);
     router.push('/belbin-result');
   } catch (error) {
     console.error('Ошибка при отправке данных:', error);
@@ -82,12 +81,14 @@ button:disabled{
 
 @media screen and (max-width: 980px) {
   .footer__wrapper{
-    width: 75%;
+    width: 90%;
     align-items: center;
   }
   button{
     width: 30%;
     height: 35px;
+    font-size: 14px;
+    font-weight: 600;
   }
   h5{
     font-size: 18px;

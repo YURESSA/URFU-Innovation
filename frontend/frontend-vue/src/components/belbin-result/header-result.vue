@@ -2,7 +2,7 @@
   <header>
     <div class="header__wrapper">
       <div class="logo">
-        <router-link to="/"><img src="/src/assets/main-page/логотип ИИ 1.svg" alt=""></router-link>
+        <router-link to="/"><img src="@public/assets/main-page/logo.svg" alt=""></router-link>
       </div>
       <div class="title">
         <h2>Результат теста</h2>

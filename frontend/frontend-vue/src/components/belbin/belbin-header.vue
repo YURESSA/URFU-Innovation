@@ -2,7 +2,7 @@
   <header>
     <div class="header__wrapper">
       <div class="logo">
-        <img src="/src/assets/main-page/логотип ИИ 1.svg" alt="">
+        <img src="@public/assets/main-page/logo.svg" alt="">
       </div>
       <div class="chapter">
         <h4><span>{{ chapter }}</span> раздел из 7</h4>

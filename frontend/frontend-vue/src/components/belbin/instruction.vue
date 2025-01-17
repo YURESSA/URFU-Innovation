@@ -1,7 +1,7 @@
 <template>
   <div class="instruction__wrapper">
     <div class="relative__wrapper">
-      <button class="close-instruction" @click="emit('closeInstruction')"><img src="/src/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
+      <button class="close-instruction" @click="emit('closeInstruction')"><img src="@public/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
       <div class="instryction">
         <h4>Инструкция</h4>
         <p>

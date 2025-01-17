@@ -1,7 +1,7 @@
 <template>
   <div class="form__wrapper">
     <div class="relative__wrapper">
-      <button class="close-form" @click="emit('closeForm')"><img src="/src/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
+      <button class="close-form" @click="emit('closeForm')"><img src="@public/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
       <div class="form">
         <h3>Заполните данные</h3>
         <form ref="studentForm" method="post" @submit="handleSubmit">
@@ -22,7 +22,7 @@
           required
           @input="validateTelegramId">
           <div class="approval">
-            <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf">обработку введенной персональной информации</a></p>
+            <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf" target="_blank">обработку введенной персональной информации</a></p>
           </div>
           <button ref="sumbitButton" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
           <p v-if="!validNumber || !validTelegram" class="error">{{ errorMessage }}</p>
@@ -97,7 +97,6 @@ function handleSubmit(event) {
     withCredentials: true,
   })
       .then(response => {
-        console.log('Данные успешно отправлены!');
         router.push(props.testUrl);
       })
       .catch(error => {
@@ -134,6 +133,7 @@ function handleSubmit(event) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 40px;
   padding: 60px 60px;
 
@@ -192,6 +192,8 @@ button:disabled{
   font-weight: 600;
   color: brown;
   margin: 0;
+  position: absolute;
+  bottom: 25px;
 }
 
 .close-form{
@@ -221,6 +223,10 @@ button:disabled{
     margin-right: 25px;
     padding: 20px 40px;
     height: 580px;
+    gap: 20px;
+  }
+  form{
+    transform: translateY(10%);
   }
   .close-form{
     top: 10px;
@@ -228,6 +234,14 @@ button:disabled{
   } 
   input{
     font-size: 14px;
+    height: 34px;
+  }
+  h3{
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-55%);
+    width: max-content;
   }
 }
 </style>
