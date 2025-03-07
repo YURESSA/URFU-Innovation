@@ -316,7 +316,7 @@ def logout():
 
 @app.route('/api/delete_admin', methods=['DELETE'])
 def delete_admin():
-    data = request.form
+    data = request.json
     username = data.get('username')
     current_user = session.get('admin_username')
     is_success, message = admin_manager.delete_admin(current_user, username)
