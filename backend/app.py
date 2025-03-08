@@ -1,16 +1,22 @@
+import os
+import re
 from io import BytesIO
-from openpyxl.utils import get_column_letter
+
 import openpyxl
-from flask import Flask, request, jsonify, session, send_file, render_template
+from flask import Flask, request, jsonify, session, send_file, render_template, \
+    send_from_directory, abort
 from flask_cors import CORS
+from openpyxl.utils import get_column_letter
+
 from controllers.AdminManager import AdminManager
 from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 allowed_origins = ["*"]
-
-app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
+exclude_paths = ['/belbin_test', '/belbin-result', '/admin', '/admin/database']
+app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True,
+                  SESSION_COOKIE_SAMESITE='None',
                   PERMANENT_SESSION_LIFETIME=86400)
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
@@ -35,12 +41,15 @@ def register_user():
     phone_number = data.get('phone_number')
     telegram_id = data.get('telegram_id')
     if not all([full_name, phone_number, telegram_id]):
-        return jsonify({"success": False, "message": "Необходимо заполнить все поля"}), 400
+        return jsonify({"success": False,
+                        "message": "Необходимо заполнить все поля"}), 400
 
-    is_success, message = user_manager.register_user(full_name, phone_number, telegram_id)
+    is_success, message = user_manager.register_user(full_name, phone_number,
+                                                     telegram_id)
     session['telegram_id'] = telegram_id
 
-    return jsonify({"success": is_success, "message": 'Форма успешно принята'}), 201
+    return jsonify(
+        {"success": is_success, "message": 'Форма успешно принята'}), 201
 
 
 @app.route('/api/logout-user', methods=['POST'])
@@ -60,13 +69,16 @@ def get_all_test():
 
 
 def get_top_sections(section_data):
-    sorted_sections = sorted(section_data.items(), key=lambda x: x[1], reverse=True)
-    top_values = [sorted_sections[0][1], sorted_sections[1][1], sorted_sections[2][1]]
+    sorted_sections = sorted(section_data.items(), key=lambda x: x[1],
+                             reverse=True)
+    top_values = [sorted_sections[0][1], sorted_sections[1][1],
+                  sorted_sections[2][1]]
 
     if len(set(top_values)) == 3:
         return [sorted_sections[0][0], sorted_sections[1][0]]
     else:
-        return [sorted_sections[0][0], sorted_sections[1][0], sorted_sections[2][0]]
+        return [sorted_sections[0][0], sorted_sections[1][0],
+                sorted_sections[2][0]]
 
 
 @app.route('/api/belbin-test', methods=['GET', 'POST'])
@@ -82,7 +94,8 @@ def process_post_request():
     data = request.json
     telegram_id = session.get('telegram_id')
     if not telegram_id:
-        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
+        return jsonify(
+            {"success": False, "message": "Пользователь не авторизован!"}), 401
 
     user_id = user_manager.get_user_id(telegram_id)[0]
     test_id = 1
@@ -92,12 +105,15 @@ def process_post_request():
 
     roles_data = test_manager.get_roles_and_descriptions()
     data_percentages = calculate_percentages(result)
-    data_percentages = dict(sorted(data_percentages.items(), key=lambda item: item[1], reverse=True))
+    data_percentages = dict(
+        sorted(data_percentages.items(), key=lambda item: item[1],
+               reverse=True))
     top_result, bottom_result = get_tops_and_bottoms_sections(data_percentages)
     built_top_result = build_top_result(top_result, roles_data)
     built_bottom_result = build_bottom_result(bottom_result, roles_data)
     test_manager.save_user_answers(user_test_id, data_percentages)
-    data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
+    data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in
+                  data_percentages.items()}
 
     logout_user()
 
@@ -117,33 +133,46 @@ def get_questions():
 
 def calculate_section_scores(data):
     return {
-        'section1': data[2][0] + data[1][1] + data[5][2] + data[0][3] + data[4][5] + data[6][6] + data[3][7],
-        'section2': data[6][0] + data[3][1] + data[2][2] + data[4][3] + data[1][4] + data[0][5] + data[5][6],
-        'section3': data[5][0] + data[0][2] + data[2][3] + data[3][4] + data[6][5] + data[1][6] + data[4][7],
-        'section4': data[4][0] + data[6][1] + data[3][2] + data[1][3] + data[5][4] + data[2][6] + data[0][7],
-        'section5': data[1][0] + data[4][1] + data[3][3] + data[6][4] + data[5][5] + data[0][6] + data[2][7],
-        'section6': data[3][0] + data[0][1] + data[5][1] + data[4][2] + data[2][4] + data[1][5] + data[6][7],
-        'section7': data[0][0] + data[1][2] + data[6][3] + data[4][4] + data[2][5] + data[3][6] + data[5][7],
-        'section8': data[2][1] + data[6][2] + data[5][3] + data[0][4] + data[3][5] + data[4][6] + data[1][7],
+        'section1': data[2][0] + data[1][1] + data[5][2] + data[0][3] +
+                    data[4][5] + data[6][6] + data[3][7],
+        'section2': data[6][0] + data[3][1] + data[2][2] + data[4][3] +
+                    data[1][4] + data[0][5] + data[5][6],
+        'section3': data[5][0] + data[0][2] + data[2][3] + data[3][4] +
+                    data[6][5] + data[1][6] + data[4][7],
+        'section4': data[4][0] + data[6][1] + data[3][2] + data[1][3] +
+                    data[5][4] + data[2][6] + data[0][7],
+        'section5': data[1][0] + data[4][1] + data[3][3] + data[6][4] +
+                    data[5][5] + data[0][6] + data[2][7],
+        'section6': data[3][0] + data[0][1] + data[5][1] + data[4][2] +
+                    data[2][4] + data[1][5] + data[6][7],
+        'section7': data[0][0] + data[1][2] + data[6][3] + data[4][4] +
+                    data[2][5] + data[3][6] + data[5][7],
+        'section8': data[2][1] + data[6][2] + data[5][3] + data[0][4] +
+                    data[3][5] + data[4][6] + data[1][7],
     }
 
 
 def calculate_percentages(result):
     total_sum = sum(result.values())
-    return {key: round((value / total_sum) * 100) for key, value in result.items()}
+    return {key: round((value / total_sum) * 100) for key, value in
+            result.items()}
 
 
 def get_tops_and_bottoms_sections(data_percentages):
-    filtered_data = {key: value for key, value in data_percentages.items() if value > 0}
+    filtered_data = {key: value for key, value in data_percentages.items() if
+                     value > 0}
     sorted_values = sorted(set(filtered_data.values()), reverse=True)
     top_two_values = set(sorted_values[:2])
-    top_result = {key: value for key, value in filtered_data.items() if value in top_two_values}
+    top_result = {key: value for key, value in filtered_data.items() if
+                  value in top_two_values}
 
     if len(top_result) < 3:
         top_two_values = set(sorted_values[:3])
-        top_result = {key: value for key, value in filtered_data.items() if value in top_two_values}
+        top_result = {key: value for key, value in filtered_data.items() if
+                      value in top_two_values}
 
-    filtered_data = {key: value for key, value in data_percentages.items() if key not in top_result.keys()}
+    filtered_data = {key: value for key, value in data_percentages.items() if
+                     key not in top_result.keys()}
     sorted_values_bottom = sorted(set(filtered_data.values()))
     bottom_two_values = set(sorted_values_bottom[:2])
     bottom_result = {key: value for key, value in filtered_data.items() if
@@ -198,9 +227,11 @@ def get_test_results():
 
     current_user = session.get('admin_username')
     if not current_user or not admin_manager.is_admin(current_user):
-        return jsonify({"success": False, "message": "Только администратторы могут выполнять данное действие!"}), 403
+        return jsonify({"success": False,
+                        "message": "Только администратторы могут выполнять данное действие!"}), 403
 
-    results = test_manager.get_filtered_results(telegram_id, test_name, start_date, end_date)
+    results = test_manager.get_filtered_results(telegram_id, test_name,
+                                                start_date, end_date)
     return jsonify({"success": True, "results": results}), 200
 
 
@@ -213,9 +244,11 @@ def save_test_results():
     end_date = data.get('end_date')
     current_user = session.get('admin_username')
     if not current_user or not admin_manager.is_admin(current_user):
-        return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
+        return jsonify({"success": False,
+                        "message": "Только администраторы могут выполнять данное действие!"}), 403
 
-    results = test_manager.get_filtered_results(telegram_id, test_name, start_date, end_date)
+    results = test_manager.get_filtered_results(telegram_id, test_name,
+                                                start_date, end_date)
     wb, ws = create_excel_file(results)
     adjust_column_widths(ws)
     return save_and_send_file(wb)
@@ -226,7 +259,8 @@ def create_excel_file(results):
     ws = wb.active
     ws.title = 'Test Results'
     keys = list(results[0].get('sections').keys())
-    headers = ['ФИО', 'Номер телефона', 'Telegram ID', 'Название теста', 'Время прохождения'] + keys
+    headers = ['ФИО', 'Номер телефона', 'Telegram ID', 'Название теста',
+               'Время прохождения'] + keys
     ws.append(headers)
 
     for result in results:
@@ -244,13 +278,15 @@ def format_result_row(result):
     timestamp = result.get('timestamp')
     sections = result.get('sections')
     sections_str = [float(i) for i in sections.values()]
-    return [full_name, phone_number, telegram_id, test_name, timestamp] + sections_str
+    return [full_name, phone_number, telegram_id, test_name,
+            timestamp] + sections_str
 
 
 def adjust_column_widths(ws):
     for col in range(1, len(ws[1]) + 1):
         column = get_column_letter(col)
-        max_length = max(len(str(cell.value)) for cell in ws[column] if cell.value is not None)
+        max_length = max(len(str(cell.value)) for cell in ws[column] if
+                         cell.value is not None)
         adjusted_width = max_length + 2
         ws.column_dimensions[column].width = adjusted_width
 
@@ -259,7 +295,8 @@ def save_and_send_file(wb):
     file_stream = BytesIO()
     wb.save(file_stream)
     file_stream.seek(0)
-    return send_file(file_stream, as_attachment=True, download_name='test_results.xlsx',
+    return send_file(file_stream, as_attachment=True,
+                     download_name='test_results.xlsx',
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
@@ -268,13 +305,15 @@ def register():
     data = request.form
     current_user = session.get('admin_username')
     if not current_user:
-        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
+        return jsonify(
+            {"success": False, "message": "Пользователь не авторизован!"}), 401
 
     username = data.get('username')
     password1 = data.get('password1')
     password2 = data.get('password2')
 
-    is_success, message = admin_manager.register_admin(current_user, username, password1, password2)
+    is_success, message = admin_manager.register_admin(current_user, username,
+                                                       password1, password2)
     code = 201 if is_success else 403
     return jsonify({"success": is_success, "message": message}), code
 
@@ -289,7 +328,8 @@ def login():
         return jsonify({"success": False, "message": message}), 401
     session['admin_username'] = username
     role = admin_manager.is_super_admin(username)
-    return jsonify({"success": is_success, "message": message, "super_admin": role}), 200
+    return jsonify(
+        {"success": is_success, "message": message, "super_admin": role}), 200
 
 
 @app.route('/api/change-password', methods=['POST'])
@@ -301,9 +341,13 @@ def change_password():
     new_password2 = data.get('new_password2')
 
     if not username:
-        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
+        return jsonify(
+            {"success": False, "message": "Пользователь не авторизован!"}), 401
 
-    is_success, message = admin_manager.change_password(username, current_password, new_password1, new_password2)
+    is_success, message = admin_manager.change_password(username,
+                                                        current_password,
+                                                        new_password1,
+                                                        new_password2)
     code = 200 if is_success else 400
     return jsonify({"success": is_success, "message": message}), code
 
@@ -330,7 +374,8 @@ def get_all_admins():
 
     is_success, result = admin_manager.get_all_admins(current_user)
     if not is_success:
-        return jsonify({"success": False, "message": result}), 403 if "Только супер-администраторы" in result else 401
+        return jsonify({"success": False,
+                        "message": result}), 403 if "Только супер-администраторы" in result else 401
 
     return jsonify({"success": True, "admins": result}), 200
 
@@ -339,19 +384,35 @@ def get_all_admins():
 def promote_to_super_admin():
     current_user = session.get('admin_username')
     if not current_user:
-        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
+        return jsonify(
+            {"success": False, "message": "Пользователь не авторизован!"}), 401
 
     data = request.json
     username = data.get('username')
 
-    is_success, message = admin_manager.promote_to_super_admin(current_user, username)
+    is_success, message = admin_manager.promote_to_super_admin(current_user,
+                                                               username)
     code = 200 if is_success else 403
     return jsonify({"success": is_success, "message": message}), code
 
 
-@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def index(path):
+def static_proxy(path):
+    fullpath = os.path.join(app.static_folder, path)
+    fullpath = fullpath.replace('\\admin', '')
+
+    if os.path.exists(fullpath):
+        path = path.replace('admin/', '')
+        return send_from_directory(app.static_folder,
+                                   path)
+    elif not any(
+            re.fullmatch(route.strip('/'), path) for route in exclude_paths):
+        abort(404)
+    return index()
+
+
+@app.route('/')
+def index():
     return render_template('index.html')
 
 
