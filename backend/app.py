@@ -399,15 +399,20 @@ def promote_to_super_admin():
 @app.route('/<path:path>')
 def static_proxy(path):
     fullpath = os.path.join(app.static_folder, path)
-    fullpath = fullpath.replace('\\admin', '')
 
     if os.path.exists(fullpath):
-        path = path.replace('admin/', '')
-        return send_from_directory(app.static_folder,
-                                   path)
-    elif not any(
+        return send_from_directory(app.static_folder, path)
+
+    if path.startswith("admin/"):
+        corrected_path = path[len("admin/"):]
+        corrected_fullpath = os.path.join(app.static_folder, corrected_path)
+        if os.path.exists(corrected_fullpath):
+            return send_from_directory(app.static_folder, corrected_path)
+
+    if not any(
             re.fullmatch(route.strip('/'), path) for route in exclude_paths):
         abort(404)
+
     return index()
 
 
