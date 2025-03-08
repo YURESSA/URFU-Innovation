@@ -6,6 +6,7 @@ import openpyxl
 from flask import Flask, request, jsonify, session, send_file, render_template, \
     send_from_directory, abort
 from flask_cors import CORS
+from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
 from controllers.AdminManager import AdminManager
@@ -267,19 +268,52 @@ def create_excel_file(results):
         row = format_result_row(result)
         ws.append(row)
 
+    format_phone_numbers(ws)
+    highlight_cells(ws, len(headers))  # Применяем стили
     return wb, ws
 
 
 def format_result_row(result):
     full_name = result.get('full_name')
-    phone_number = result.get('phone_number')
+    phone_number = str(result.get('phone_number'))  # Преобразуем в строку
     telegram_id = result.get('telegram_id')
     test_name = result.get('test_name')
     timestamp = result.get('timestamp')
     sections = result.get('sections')
-    sections_str = [float(i) for i in sections.values()]
+    sections_values = [float(i) for i in sections.values()]
     return [full_name, phone_number, telegram_id, test_name,
-            timestamp] + sections_str
+            timestamp] + sections_values
+
+
+def format_phone_numbers(ws):
+    """Форматирует номера телефонов как текст"""
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=2,
+                            max_col=2):
+        for cell in row:
+            cell.number_format = '@'  # Устанавливаем текстовый формат
+
+
+def highlight_cells(ws, num_columns):
+    green_fill = PatternFill(start_color="FF99FFCC", end_color="FF99FFCC",
+                             fill_type="solid")
+    red_fill = PatternFill(start_color="FFFF7C80", end_color="FFFF7C80",
+                           fill_type="solid")
+
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=6,
+                            max_col=num_columns):
+        scores = [cell.value for cell in row if
+                  isinstance(cell.value, (int, float))]
+        if not scores:
+            continue
+
+        top_3_values = sorted(scores, reverse=True)[:3]
+
+        for cell in row:
+            if isinstance(cell.value, (int, float)):
+                if cell.value in top_3_values:
+                    cell.fill = green_fill
+                elif 0 <= cell.value <= 3:
+                    cell.fill = red_fill
 
 
 def adjust_column_widths(ws):
