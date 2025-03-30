@@ -195,7 +195,10 @@ def build_top_result(final_data, roles_data):
             final_result.append({
                 'role': role_info['role_in_team'],
                 'strong_side': role_info['strong-side'],
+                'weak_side': role_info['weak-side'],
                 'value': value,
+                'term': role_info['term'],
+                'goal': role_info['goal'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
             })
@@ -211,6 +214,9 @@ def build_bottom_result(final_data, roles_data):
                 'role': role_info['role_in_team'],
                 'value': value,
                 'weak_side': role_info['weak-side'],
+                'strong_side': role_info['strong-side'],
+                'term': role_info['term'],
+                'goal': role_info['goal'],
                 'recommendations': role_info['recommendations'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']

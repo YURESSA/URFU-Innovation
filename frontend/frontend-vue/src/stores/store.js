@@ -37,6 +37,7 @@ export const useDataStore = defineStore('data', {
                     withCredentials: true,
                 }); // получаю результаты теста Белбина
                 this.belbinResult = response.data;
+                console.log('Результат теста Белбина:', this.belbinResult);
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }
