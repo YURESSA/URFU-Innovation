@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 
 
-export const baseUrl = 'http://127.0.0.1:5000/'
+export const baseUrl = 'https://urfuinnovate.pythonanywhere.com'
 
 export const useDataStore = defineStore('data', {
     state: () => ({
@@ -37,7 +37,6 @@ export const useDataStore = defineStore('data', {
                     withCredentials: true,
                 }); // получаю результаты теста Белбина
                 this.belbinResult = response.data;
-                console.log('Результат теста Белбина:', this.belbinResult);
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }

@@ -34,7 +34,7 @@
           <div class="approval">
             <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf" target="_blank">обработку введенной персональной информации</a></p>
           </div>
-          <button ref="sumbitButton" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
+          <button ref="sumbitButton" class="sumbit" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
           <p v-if="!validNumber || !validTelegram" class="error">{{ errorMessage }}</p>
         </form>
       </div>
@@ -99,7 +99,6 @@ const validateTelegramId = (event) => {
 
 function handleSubmit(event) {
   event.preventDefault();
-  alert('араара')
   document.body.classList.remove('modal-open');
   const formData = new FormData(studentForm.value);
   sumbitButton.value.disabled = true;
@@ -109,11 +108,9 @@ function handleSubmit(event) {
   })
       .then(response => {
         router.push(props.testUrl);
-        alert(response)
       })
       .catch(error => {
         console.error('Произошла ошибка:', error);
-        alert(error)
       })
       .finally(() => {
         sumbitButton.value.disabled = false;
@@ -199,12 +196,15 @@ input {
   margin: 0;
 }
 
+.sumbit{
+  margin-top: 30px;
+}
+
 button {
   border: 0.50px solid #2b2a28;
   border-radius: 7px;
   background-color: #57c0cf;
   padding: 10px 25px;
-  margin-top: 30px;
 }
 
 button:hover {
