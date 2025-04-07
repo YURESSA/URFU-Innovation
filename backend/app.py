@@ -15,14 +15,13 @@ from controllers.UserManager import UserManager
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 allowed_origins = ["*"]
-exclude_paths = ['/belbin_test', '/belbin-result', '/admin', '/admin/database']
-app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True,
-                  SESSION_COOKIE_SAMESITE='None',
+
+app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
                   PERMANENT_SESSION_LIFETIME=86400)
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
 app.secret_key = 'URFU-INNOVATE-2024'
-deploy = True
+deploy = False
 if deploy:
     db_path = '/home/urfuinnovate/URFU-Innovation/backend/data/innovate.db3'
     belbin_test = '/home/urfuinnovate/URFU-Innovation/backend/data/belbin/belbin.json'
@@ -449,9 +448,7 @@ def static_proxy(path):
         if os.path.exists(corrected_fullpath):
             return send_from_directory(app.static_folder, corrected_path)
 
-    if not any(
-            re.fullmatch(route.strip('/'), path) for route in exclude_paths):
-        abort(404)
+
 
     return index()
 

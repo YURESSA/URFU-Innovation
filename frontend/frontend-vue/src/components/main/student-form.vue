@@ -99,6 +99,7 @@ const validateTelegramId = (event) => {
 
 function handleSubmit(event) {
   event.preventDefault();
+  alert('араара')
   document.body.classList.remove('modal-open');
   const formData = new FormData(studentForm.value);
   sumbitButton.value.disabled = true;
@@ -108,9 +109,11 @@ function handleSubmit(event) {
   })
       .then(response => {
         router.push(props.testUrl);
+        alert(response)
       })
       .catch(error => {
         console.error('Произошла ошибка:', error);
+        alert(error)
       })
       .finally(() => {
         sumbitButton.value.disabled = false;
