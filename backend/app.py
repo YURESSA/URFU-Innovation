@@ -1,9 +1,10 @@
+import os
 from io import BytesIO
 
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 import openpyxl
-from flask import Flask, request, jsonify, session, send_file, render_template
+from flask import Flask, request, jsonify, session, send_file, render_template, send_from_directory
 from flask_cors import CORS
 from controllers.AdminManager import AdminManager
 from controllers.TestManager import TestManager
@@ -17,7 +18,7 @@ app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESS
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
 app.secret_key = 'URFU-INNOVATE-2024'
-deploy = False
+deploy = True
 if deploy:
     db_path = '/home/urfuinnovate/URFU-Innovation/backend/data/innovate.db3'
     belbin_test = '/home/urfuinnovate/URFU-Innovation/backend/data/belbin/belbin.json'
@@ -430,6 +431,12 @@ def promote_to_super_admin():
 def catch_all(path):
     if path.startswith('assets/'):
         return app.send_static_file(path)
+
+    if path.startswith("admin/"):
+        corrected_path = path[len("admin/"):]
+        corrected_fullpath = os.path.join(app.static_folder, corrected_path)
+        if os.path.exists(corrected_fullpath):
+            return send_from_directory(app.static_folder, corrected_path)
     return render_template('index.html')
 
 
