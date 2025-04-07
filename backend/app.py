@@ -432,11 +432,6 @@ def catch_all(path):
     if path.startswith('assets/'):
         return app.send_static_file(path)
 
-    if path.startswith("admin/"):
-        corrected_path = path[len("admin/"):]
-        corrected_fullpath = os.path.join(app.static_folder, corrected_path)
-        if os.path.exists(corrected_fullpath):
-            return send_from_directory(app.static_folder, corrected_path)
     return render_template('index.html')
 
 
