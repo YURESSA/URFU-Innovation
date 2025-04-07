@@ -22,7 +22,7 @@ app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True,
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
 app.secret_key = 'URFU-INNOVATE-2024'
-deploy = True
+deploy = False
 if deploy:
     db_path = '/home/urfuinnovate/URFU-Innovation/backend/data/innovate.db3'
     belbin_test = '/home/urfuinnovate/URFU-Innovation/backend/data/belbin/belbin.json'
@@ -112,7 +112,7 @@ def process_post_request():
     top_result, bottom_result = get_tops_and_bottoms_sections(data_percentages)
     built_top_result = build_top_result(top_result, roles_data)
     built_bottom_result = build_bottom_result(bottom_result, roles_data)
-    test_manager.save_user_answers(user_test_id, result)
+    test_manager.save_user_answers(user_test_id, data_percentages)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in
                   data_percentages.items()}
 

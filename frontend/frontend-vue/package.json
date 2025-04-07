@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint  --fix",
-    "format": "prettier --write src",
+    "lint": "eslint . --fix",
+    "format": "prettier --write src/",
     "css": "tailwindcss -i ./src/assets/input.css -o ./app/assets/tailwind.css --watch"
   },
   "dependencies": {
