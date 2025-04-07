@@ -24,6 +24,7 @@
         </div>
       </div>
     </div>
+    <hr>
     <div class="title weak-title">
       <h4 class="font">Ваши слабые роли</h4>
       <img src="/public/assets/belbin/Arrow 1.svg" alt="">
@@ -88,10 +89,6 @@ main {
   gap: 30px;
 }
 
-.weak-title{
-  margin-top: 200px;
-}
-
 .title img {
   padding-top: 20px;
 }
@@ -103,6 +100,10 @@ main {
 
 .second {
   color: #57c0cf;
+}
+
+.top-roles{
+  margin-bottom: 40px;
 }
 
 .top-roles, .non-top-roles {
@@ -146,6 +147,12 @@ li {
   max-width: 417px;
 }
 
+hr{
+  height: 1px;
+  width: 100%;
+  background-color: black;
+}
+
 .info-role {
   display: flex;
   flex-direction: column;
@@ -169,7 +176,9 @@ h4 {
   h4 {
     font-size: 32px;
   }
-
+  hr{
+    width: 85%;
+  }
   .title > img {
     display: none;
   }
