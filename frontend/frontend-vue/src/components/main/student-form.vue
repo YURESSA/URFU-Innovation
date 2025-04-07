@@ -5,22 +5,32 @@
       <div class="form">
         <h3>Заполните данные</h3>
         <form ref="studentForm" method="post" @submit="handleSubmit">
-          <input type="text" name="full_name" autocomplete="off" placeholder="ФИО" required>
-          <input
-          type="tel"
-          v-model="phoneNumber"
-          name="phone_number"
-          autocomplete="off"
-          required
-          @input="validatePhoneNumber">
-          <input
-          type="text"
-          v-model="telegramId"
-          name="telegram_id"
-          autocomplete="off"
-          placeholder="Телеграмм: @userName"
-          required
-          @input="validateTelegramId">
+          <div class="input-wrapper">
+            <label for="full_name">ФИО</label>
+            <input type="text" name="full_name" autocomplete="off" placeholder="Иванов Иван Иванович" required>
+          </div>
+          <div class="input-wrapper">
+            <label for="full_name">Номер телефона</label>
+            <input
+            type="tel"
+            v-model="phoneNumber"
+            name="phone_number"
+            autocomplete="off"
+            required
+            @input="validatePhoneNumber">
+          </div>
+          <div class="input-wrapper">
+            <label for="full_name">Способ связи. Телеграмм или номер телефона</label>
+            <input
+            type="text"
+            class="contact-data"
+            v-model="telegramId"
+            name="telegram_id"
+            autocomplete="off"
+            placeholder="@UserName или @+79998881122"
+            required
+            @input="validateTelegramId">
+          </div>
           <div class="approval">
             <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf" target="_blank">обработку введенной персональной информации</a></p>
           </div>
@@ -78,7 +88,7 @@ const validateTelegramId = (event) => {
     input = input.slice(0, 33);
   }
   telegramId.value = input;
-  validTelegram.value = /^@[a-zA-Z0-9_]{5,32}$/.test(input);
+  validTelegram.value = /^@[a-zA-Z0-9_+]{5,32}$/.test(input);
 
   if (!validTelegram.value) {
     errorMessage.value = 'Некорректный телеграмм';
@@ -125,7 +135,6 @@ function handleSubmit(event) {
 
 .relative__wrapper{
   position: relative;
-  left: 3%;
 }
 
 .form {
@@ -144,17 +153,33 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+}
+
+.input-wrapper{
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+}
+
+label{
+  font-size: 20px;
+  font-weight: 600;
+  padding-left: 5px;
+}
+
+.contact-data::placeholder { 
+  font-size: 16px;
 }
 
 input {
   border: 1px solid #2b2a28;
   border-radius: 7px;
-  width: 85%;
+  width: 100%;
   height: 55px;
   background-color: #c7c7c7;
   padding: 5px 10px;
   font-size: 24px;
+  margin-bottom: 30px;
 }
 
 .approval{
@@ -176,6 +201,7 @@ button {
   border-radius: 7px;
   background-color: #57c0cf;
   padding: 10px 25px;
+  margin-top: 30px;
 }
 
 button:hover {
@@ -192,7 +218,7 @@ button:disabled{
   color: brown;
   margin: 0;
   position: absolute;
-  bottom: 25px;
+  bottom: 115px;
 }
 
 .close-form{
@@ -219,21 +245,23 @@ button:disabled{
 
 @media screen and (max-width: 980px) {
   .form{
-    margin-right: 25px;
     padding: 20px 40px;
     height: 580px;
+    max-width: 300px;
     gap: 20px;
+  }
+  .error{
+    bottom: 52px;
   }
   form{
     transform: translateY(10%);
   }
-  .close-form{
-    top: 10px;
-    right: 30px;
-  } 
   input{
     font-size: 14px;
     height: 34px;
+  }
+  .contact-data::placeholder { 
+  font-size: 11px;
   }
   h3{
     position: absolute;

@@ -12,13 +12,20 @@
         </div>
         <div class="info-role">
           <h5>Описание</h5>
+          <p class="start-descript">
+            Термин, который характеризует — <b>{{ item.term }}</b> <br>
+            {{ item.goal }}
+          </p>
           <p>{{ item.description }}</p>
           <h5>Сильные стороны</h5>
-          <p>{{ item.strong_side }}</p>
+          <ul>
+            <li v-for="(strong, i) in item.strong_side" :key="i"> {{ strong }} </li>
+          </ul>
         </div>
       </div>
     </div>
-    <div class="title">
+    <hr>
+    <div class="title weak-title">
       <h4 class="font">Ваши слабые роли</h4>
       <img src="/public/assets/belbin/Arrow 1.svg" alt="">
     </div>
@@ -30,9 +37,16 @@
         </div>
         <div class="info-role">
           <h5>Описание</h5>
+          <p class="start-descript">
+            Термин, который характеризует — <b>{{ item.term }}</b> <br>
+            {{ item.goal }}
+          </p>
+          
           <p>{{ item.description }}</p>
           <h5>Слабые стороны</h5>
-          <p>{{ item.weak_side }}</p>
+          <ul>
+            <li v-for="(weak, i) in item.weak_side" :key="i"> {{ weak }} </li>
+          </ul>
           <h5>Рекомендации для развития</h5>
           <ul>
             <li v-for="(recomend, i) in item.recommendations" :key="i"> {{ recomend }} </li>
@@ -49,6 +63,8 @@ import { defineProps } from 'vue';
 const props = defineProps({
   data: Object,
 })
+
+console.log(props.data.prefer_roles[0].strong_side)
 </script>
 
 <style scoped>
@@ -59,6 +75,10 @@ main {
   justify-content: center;
   width: 65%;
   margin: 0 auto;
+}
+
+.start-descript{
+  margin-bottom: 0px;
 }
 
 .title {
@@ -80,6 +100,10 @@ main {
 
 .second {
   color: #57c0cf;
+}
+
+.top-roles{
+  margin-bottom: 40px;
 }
 
 .top-roles, .non-top-roles {
@@ -123,6 +147,12 @@ li {
   max-width: 417px;
 }
 
+hr{
+  height: 1px;
+  width: 100%;
+  background-color: black;
+}
+
 .info-role {
   display: flex;
   flex-direction: column;
@@ -146,7 +176,9 @@ h4 {
   h4 {
     font-size: 32px;
   }
-
+  hr{
+    width: 85%;
+  }
   .title > img {
     display: none;
   }
