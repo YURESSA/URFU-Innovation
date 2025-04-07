@@ -1,13 +1,10 @@
-import os
 from io import BytesIO
 
-import openpyxl
-from flask import Flask, request, jsonify, session, send_file, render_template, \
-    send_from_directory
-from flask_cors import CORS
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
-
+import openpyxl
+from flask import Flask, request, jsonify, session, send_file, render_template
+from flask_cors import CORS
 from controllers.AdminManager import AdminManager
 from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
@@ -193,10 +190,7 @@ def build_top_result(final_data, roles_data):
             final_result.append({
                 'role': role_info['role_in_team'],
                 'strong_side': role_info['strong-side'],
-                'weak_side': role_info['weak-side'],
                 'value': value,
-                'term': role_info['term'],
-                'goal': role_info['goal'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
             })
@@ -212,9 +206,6 @@ def build_bottom_result(final_data, roles_data):
                 'role': role_info['role_in_team'],
                 'value': value,
                 'weak_side': role_info['weak-side'],
-                'strong_side': role_info['strong-side'],
-                'term': role_info['term'],
-                'goal': role_info['goal'],
                 'recommendations': role_info['recommendations'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
@@ -434,24 +425,11 @@ def promote_to_super_admin():
     return jsonify({"success": is_success, "message": message}), code
 
 
+@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def static_proxy(path):
-    fullpath = os.path.join(app.static_folder, path)
-
-    if os.path.exists(fullpath):
-        return send_from_directory(app.static_folder, path)
-
-    if path.startswith("admin/"):
-        corrected_path = path[len("admin/"):]
-        corrected_fullpath = os.path.join(app.static_folder, corrected_path)
-        if os.path.exists(corrected_fullpath):
-            return send_from_directory(app.static_folder, corrected_path)
-
-    return index()
-
-
-@app.route('/')
-def index():
+def catch_all(path):
+    if path.startswith('assets/'):
+        return app.send_static_file(path)
     return render_template('index.html')
 
 
