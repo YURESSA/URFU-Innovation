@@ -13,9 +13,9 @@ from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-allowed_origins = ["https://urfuinnovate.pythonanywhere.com/"]
+allowed_origins = ["*"]
 
-app.config.update(SESSION_COOKIE_SAMESITE='None',
+app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
                   PERMANENT_SESSION_LIFETIME=86400)
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
