@@ -1,10 +1,9 @@
 import os
-import re
 from io import BytesIO
 
 import openpyxl
 from flask import Flask, request, jsonify, session, send_file, render_template, \
-    send_from_directory, abort
+    send_from_directory
 from flask_cors import CORS
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
@@ -14,9 +13,9 @@ from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-allowed_origins = ["*"]
+allowed_origins = ["https://urfuinnovate.pythonanywhere.com/"]
 
-app.config.update(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE='None',
+app.config.update(SESSION_COOKIE_SAMESITE='None',
                   PERMANENT_SESSION_LIFETIME=86400)
 
 CORS(app, supports_credentials=True, origins=allowed_origins)
@@ -447,8 +446,6 @@ def static_proxy(path):
         corrected_fullpath = os.path.join(app.static_folder, corrected_path)
         if os.path.exists(corrected_fullpath):
             return send_from_directory(app.static_folder, corrected_path)
-
-
 
     return index()
 
