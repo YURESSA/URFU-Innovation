@@ -1,8 +1,11 @@
 from io import BytesIO
-from openpyxl.utils import get_column_letter
+
 import openpyxl
 from flask import Flask, request, jsonify, session, send_file, render_template
 from flask_cors import CORS
+from openpyxl.styles import PatternFill
+from openpyxl.utils import get_column_letter
+
 from controllers.AdminManager import AdminManager
 from controllers.TestManager import TestManager
 from controllers.UserManager import UserManager
@@ -82,7 +85,8 @@ def process_post_request():
     data = request.json
     telegram_id = session.get('telegram_id')
     if not telegram_id:
-        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
+        return jsonify(
+            {"success": False, "message": "Пользователь не авторизован!"}), 401
 
     user_id = user_manager.get_user_id(telegram_id)[0]
     test_id = 1
@@ -96,7 +100,7 @@ def process_post_request():
     top_result, bottom_result = get_tops_and_bottoms_sections(data_percentages)
     built_top_result = build_top_result(top_result, roles_data)
     built_bottom_result = build_bottom_result(bottom_result, roles_data)
-    test_manager.save_user_answers(user_test_id, data_percentages)
+    test_manager.save_user_answers(user_test_id, result)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
 
     logout_user()
@@ -153,7 +157,7 @@ def get_tops_and_bottoms_sections(data_percentages):
         bottom_two_values = set(sorted_values_bottom[:3])
         bottom_result = {key: value for key, value in filtered_data.items() if
                          value in bottom_two_values and key not in top_result}
-
+    print(1)
     return top_result, bottom_result
 
 
@@ -165,10 +169,14 @@ def build_top_result(final_data, roles_data):
             final_result.append({
                 'role': role_info['role_in_team'],
                 'strong_side': role_info['strong-side'],
+                'weak_side': role_info['weak-side'],
                 'value': value,
+                'term': role_info['term'],
+                'goal': role_info['goal'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
             })
+    print(final_result)
     return final_result
 
 
@@ -181,6 +189,9 @@ def build_bottom_result(final_data, roles_data):
                 'role': role_info['role_in_team'],
                 'value': value,
                 'weak_side': role_info['weak-side'],
+                'strong_side': role_info['strong-side'],
+                'term': role_info['term'],
+                'goal': role_info['goal'],
                 'recommendations': role_info['recommendations'],
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
@@ -226,25 +237,59 @@ def create_excel_file(results):
     ws = wb.active
     ws.title = 'Test Results'
     keys = list(results[0].get('sections').keys())
-    headers = ['ФИО', 'Номер телефона', 'Telegram ID', 'Название теста', 'Время прохождения'] + keys
+    headers = ['ФИО', 'Номер телефона', 'Telegram ID', 'Название теста',
+               'Время прохождения'] + keys
     ws.append(headers)
 
     for result in results:
         row = format_result_row(result)
         ws.append(row)
 
+    format_phone_numbers(ws)
+    highlight_cells(ws, len(headers))  # Применяем стили
     return wb, ws
 
 
 def format_result_row(result):
     full_name = result.get('full_name')
-    phone_number = result.get('phone_number')
+    phone_number = str(result.get('phone_number'))  # Преобразуем в строку
     telegram_id = result.get('telegram_id')
     test_name = result.get('test_name')
     timestamp = result.get('timestamp')
     sections = result.get('sections')
-    sections_str = [float(i) for i in sections.values()]
-    return [full_name, phone_number, telegram_id, test_name, timestamp] + sections_str
+    sections_values = [float(i) for i in sections.values()]
+    return [full_name, phone_number, telegram_id, test_name,
+            timestamp] + sections_values
+
+
+def format_phone_numbers(ws):
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=2,
+                            max_col=2):
+        for cell in row:
+            cell.number_format = '@'  # Устанавливаем текстовый формат
+
+
+def highlight_cells(ws, num_columns):
+    green_fill = PatternFill(start_color="FF99FFCC", end_color="FF99FFCC",
+                             fill_type="solid")
+    red_fill = PatternFill(start_color="FFFF7C80", end_color="FFFF7C80",
+                           fill_type="solid")
+
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=6,
+                            max_col=num_columns):
+        scores = [cell.value for cell in row if
+                  isinstance(cell.value, (int, float))]
+        if not scores:
+            continue
+
+        top_3_values = sorted(scores, reverse=True)[:3]
+
+        for cell in row:
+            if isinstance(cell.value, (int, float)):
+                if cell.value in top_3_values:
+                    cell.fill = green_fill
+                elif 0 <= cell.value <= 3:
+                    cell.fill = red_fill
 
 
 def adjust_column_widths(ws):

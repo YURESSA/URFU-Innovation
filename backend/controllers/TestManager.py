@@ -46,9 +46,11 @@ class TestManager:
                 "file_name": role.get("file_name"),
                 "strong-side": role.get("strong-side"),
                 "weak-side": role.get("weak-side"),
+                'goal': role.get("goal"),
+                'term': role.get("term"),
                 "recommendations": role.get("recommendations"),
             }
-
+        print(roles)
         return roles
 
     def save_user_answers(self, user_test_id, data_percentages):
