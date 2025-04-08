@@ -354,6 +354,8 @@ def promote_to_super_admin():
 def catch_all(path):
     if path.startswith('assets/'):
         return app.send_static_file(path)
+    if path.startswith('fonts/'):
+        return app.send_static_file(path)
     return render_template('index.html')
 
 
