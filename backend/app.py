@@ -1,7 +1,8 @@
+import os
 from io import BytesIO
 
 import openpyxl
-from flask import Flask, request, jsonify, session, send_file, render_template
+from flask import Flask, request, jsonify, session, send_file, render_template, send_from_directory
 from flask_cors import CORS
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
@@ -157,7 +158,6 @@ def get_tops_and_bottoms_sections(data_percentages):
         bottom_two_values = set(sorted_values_bottom[:3])
         bottom_result = {key: value for key, value in filtered_data.items() if
                          value in bottom_two_values and key not in top_result}
-    print(1)
     return top_result, bottom_result
 
 
@@ -176,7 +176,6 @@ def build_top_result(final_data, roles_data):
                 'description': role_info['description'],
                 'file_name': role_info['file_name']
             })
-    print(final_result)
     return final_result
 
 
@@ -401,6 +400,12 @@ def catch_all(path):
         return app.send_static_file(path)
     if path.startswith('fonts/'):
         return app.send_static_file(path)
+
+    if path.startswith("admin/"):
+        corrected_path = path[len("admin/"):]
+        corrected_fullpath = os.path.join(app.static_folder, corrected_path)
+        if os.path.exists(corrected_fullpath):
+            return send_from_directory(app.static_folder, corrected_path)
     return render_template('index.html')
 
 
