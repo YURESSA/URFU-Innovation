@@ -34,8 +34,8 @@
           <div class="approval">
             <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf" target="_blank">обработку введенной персональной информации</a></p>
           </div>
-          <button ref="sumbitButton" class="sumbit" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
           <p v-if="!validNumber || !validTelegram" class="error">{{ errorMessage }}</p>
+          <button ref="sumbitButton" class="sumbit" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
         </form>
       </div>
     </div>
@@ -158,7 +158,7 @@ form {
 .input-wrapper{
   display: flex;
   flex-direction: column;
-  width: 85%;
+  width: 100%;
 }
 
 label{
@@ -174,7 +174,6 @@ label{
 input {
   border: 1px solid #2b2a28;
   border-radius: 7px;
-  width: 100%;
   height: 55px;
   background-color: #c7c7c7;
   padding: 5px 10px;
@@ -216,12 +215,11 @@ button:disabled{
 }
 
 .error{
+  height: 25px;
   font-size: 20px;
   font-weight: 600;
   color: brown;
   margin: 0;
-  position: absolute;
-  bottom: 115px;
 }
 
 .close-form{
@@ -256,9 +254,6 @@ button:disabled{
   .error{
     bottom: 52px;
   }
-  form{
-    transform: translateY(10%);
-  }
   input{
     font-size: 14px;
     height: 34px;
@@ -267,10 +262,6 @@ button:disabled{
   font-size: 11px;
   }
   h3{
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-55%);
     width: max-content;
   }
 }
