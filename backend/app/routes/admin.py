@@ -82,3 +82,5 @@ def promote_to_super_admin():
     is_success, message = admin_manager.promote_to_super_admin(current_user, username)
     code = 200 if is_success else 403
     return jsonify({"success": is_success, "message": message}), code
+
+

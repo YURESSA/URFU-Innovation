@@ -17,3 +17,8 @@ class UserTest(Base):
 
     user = relationship("User", back_populates="tests")
     answers = relationship("UserAnswer", back_populates="user_test", uselist=False)
+    results = relationship(
+        "UserTestResult",
+        back_populates="user_test",
+        cascade="all, delete-orphan"
+    )
