@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: urfu-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/data/innovate.db3:/app/data/innovate.db3
+    env_file:
+      - backend/app/.env
+
+  frontend:
+    build:
+      context: ./frontend/frontend-vue
+    container_name: urfu-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend

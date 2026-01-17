@@ -44,7 +44,7 @@ function creatAdmin(event){
   event.preventDefault();
   const formData = new FormData(adminForm.value);
   sumbitButton.value.disabled = true;
-  axios.post(`${baseUrl}/api/register`, formData, {
+  axios.post(`${baseUrl}/register`, formData, {
     withCredentials: true,
   })
   .then(response => {

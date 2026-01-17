@@ -19,7 +19,7 @@ const router = useRouter();
 const emit = defineEmits(['openForm', 'openList'])
 
 const logout = () =>{
-  axios.get(`${baseUrl}/api/logout`, {
+  axios.get(`${baseUrl}/logout`, {
     withCredentials: true
   })
   .then(response => {

@@ -64,7 +64,7 @@ const props = defineProps({
 })
 
 function exportExcel() {
-  axios.get(`${baseUrl}/api/save-test-results`, {
+  axios.get(`${baseUrl}/save-test-results`, {
     responseType: 'blob',
     withCredentials: true
   })

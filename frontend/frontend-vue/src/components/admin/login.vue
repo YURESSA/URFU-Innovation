@@ -28,7 +28,7 @@ function submitData(event){
   const formData = new FormData(creatAdmin.value);
   sumbitButton.value.disabled = true;
 
-  axios.post(`${baseUrl}/api/login`, formData, {
+  axios.post(`${baseUrl}/login`, formData, {
     withCredentials: true,
   })
   .then(response => {

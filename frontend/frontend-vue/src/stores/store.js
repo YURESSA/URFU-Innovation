@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 
 
-export const baseUrl = 'https://urfuinnovate.pythonanywhere.com'
+export const baseUrl = import.meta.env.VITE_BASE_URL
 
 export const useDataStore = defineStore('data', {
     state: () => ({
@@ -15,7 +15,7 @@ export const useDataStore = defineStore('data', {
     actions: {
         async fetchTests() {
             try {
-                const response = await axios.get(`${baseUrl}/api/get-all-test`); // получаю название и url
+                const response = await axios.get(`${baseUrl}/get-all-test`); // получаю название и url
                 this.tests = response.data;
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
@@ -23,7 +23,7 @@ export const useDataStore = defineStore('data', {
         },
         async fetchBelbin() {
             try {
-                const response = await axios.get(`${baseUrl}/api/belbin-test`, {
+                const response = await axios.get(`${baseUrl}/belbin-test`, {
                     withCredentials: true,
                 }); // получаю вопросы теста
                 this.belbin = response.data;
@@ -33,7 +33,7 @@ export const useDataStore = defineStore('data', {
         },
         async fetchBelbinResult(result) {
             try {
-                const response = await axios.post(`${baseUrl}/api/belbin-test`, result, {
+                const response = await axios.post(`${baseUrl}/belbin-test`, result, {
                     withCredentials: true,
                 }); // получаю результаты теста Белбина
                 this.belbinResult = response.data;
@@ -43,7 +43,7 @@ export const useDataStore = defineStore('data', {
         },
         async fetchDataBase() {
             try{
-                const response = await axios.get(`${baseUrl}/api/get-test-results`, {
+                const response = await axios.get(`${baseUrl}/get-test-results`, {
                     withCredentials: true,
                 });
                 this.dataBase = response.data;
@@ -54,7 +54,7 @@ export const useDataStore = defineStore('data', {
         },
         async fetchAdmins() {
             try{
-                const response = await axios.get(`${baseUrl}/api/admins`, {
+                const response = await axios.get(`${baseUrl}/admins`, {
                     withCredentials: true,
                 });
                 this.admins = response.data;
@@ -65,7 +65,7 @@ export const useDataStore = defineStore('data', {
         },
         async fetchDeletAdmin(username) {
             try {
-                const response = await axios.delete(`${baseUrl}/api/delete_admin`, {
+                const response = await axios.delete(`${baseUrl}/delete_admin`, {
                     data: { username },
                     withCredentials: true,
                 });
@@ -76,7 +76,7 @@ export const useDataStore = defineStore('data', {
         },
         async TransferSuperAdmin(username) {
             try {
-                const response = await axios.delete(`${baseUrl}/api/promote-to-super-admin`, {
+                const response = await axios.delete(`${baseUrl}/promote-to-super-admin`, {
                     data: { username },
                     withCredentials: true,
                 }); 

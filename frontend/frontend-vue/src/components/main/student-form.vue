@@ -103,7 +103,7 @@ function handleSubmit(event) {
   const formData = new FormData(studentForm.value);
   sumbitButton.value.disabled = true;
 
-  axios.post(`${baseUrl}/api/register-user`, formData, {
+  axios.post(`${baseUrl}/register-user`, formData, {
     withCredentials: true,
   })
       .then(response => {
