@@ -4,7 +4,7 @@ from flask import Blueprint, request, session, jsonify
 from flask import session as flask_session
 
 from ..controllers.AdminManager import AdminManager
-from ..controllers.TestManager import TestManager
+from ..controllers.TestManager import TestManager, get_tests
 from ..controllers.UserManager import UserManager
 from ..database import SessionLocal
 from ..models.test import TestEnum
@@ -23,7 +23,7 @@ test_manager = TestManager(session_factory=SessionLocal, belbin_test=BELBIN_TEST
 
 @test_bp.route('/get-all-test', methods=['GET'])
 def get_all_test():
-    tests = test_manager.get_tests()
+    tests = get_tests()
     return jsonify([{'test_title': t[0], 'test_url': t[1]} for t in tests])
 
 

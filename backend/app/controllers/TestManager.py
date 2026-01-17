@@ -11,6 +11,10 @@ from app.models.user_answer import UserAnswer
 from app.models.user_test import UserTest
 
 
+def get_tests():
+    return [(t.display_name, t.url) for t in TestEnum]
+
+
 class TestManager:
     def __init__(self, session_factory=None, belbin_test='data/belbin/belbin.json'):
         self.session_factory = session_factory or SessionLocal
@@ -44,9 +48,6 @@ class TestManager:
                 "recommendations": role.get("recommendations"),
             }
         return roles
-
-    def get_tests(self):
-        return [(t.display_name, t.url) for t in TestEnum]
 
     def save_user_answers(self, user_test_id, data_percentages):
         section_values = {f"section{i}": data_percentages.get(f"section{i}", 0) for i in range(1, 9)}
