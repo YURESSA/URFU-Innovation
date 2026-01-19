@@ -434,12 +434,14 @@ def save_disc_test_results_excel():
         adjust_column_widths(ws)
         return save_and_send_file(wb)
 
+
 thin_border = Border(
     left=Side(style='thin'),
     right=Side(style='thin'),
     top=Side(style='thin'),
     bottom=Side(style='thin')
 )
+
 
 @test_bp.route('/user-tests/export', methods=['GET'])
 def export_user_tests_excel():
@@ -451,10 +453,9 @@ def export_user_tests_excel():
     from flask import send_file
     import tempfile
 
-    # ---- CHECK ADMIN (если нужно) ----
-    # admin_manager = AdminManager(SessionLocal)
-    # if not current_user or not admin_manager.is_admin(current_user):
-    #     return jsonify({"success": False, "message": "Только администраторы"}), 403
+    admin_manager = AdminManager(SessionLocal)
+    if not current_user or not admin_manager.is_admin(current_user):
+        return jsonify({"success": False, "message": "Только администраторы"}), 403
 
     test_manager = TestManager(SessionLocal)
     roles_dict = test_manager.get_roles_and_descriptions()
@@ -550,7 +551,6 @@ def export_user_tests_excel():
         # BELBIN
         for role in belbin_roles:
             row.append(user["belbin"].get(role))
-
 
         # DISC
         for scale in disc_scales:
