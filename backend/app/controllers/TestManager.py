@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timedelta
 
 from sqlalchemy import select, and_
@@ -18,7 +19,9 @@ def get_tests():
 class TestManager:
     def __init__(self, session_factory=None, belbin_test='data/belbin/belbin.json'):
         self.session_factory = session_factory or SessionLocal
-        self.belbin_test = belbin_test
+        self.belbin_test = os.path.join(
+            os.path.dirname(__file__), "..", "data", "belbin", "belbin.json"
+        )
 
     def get_all_questions(self):
         with open(self.belbin_test, 'r', encoding='utf-8') as file:
@@ -127,5 +130,6 @@ class TestManager:
                 "timestamp": ut.timestamp,
                 "sections": sections
             })
+        print()
         return formatted
 

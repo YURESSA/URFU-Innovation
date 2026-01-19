@@ -16,9 +16,5 @@ class UserTest(Base):
     timestamp = Column(DateTime, default=datetime.now)
 
     user = relationship("User", back_populates="tests")
-    answers = relationship("UserAnswer", back_populates="user_test", uselist=False)
-    results = relationship(
-        "UserTestResult",
-        back_populates="user_test",
-        cascade="all, delete-orphan"
-    )
+    results = relationship("UserTestResult", cascade="all, delete-orphan", back_populates="user_test")
+    answers = relationship("UserAnswer", uselist=False, cascade="all, delete-orphan", back_populates="user_test")

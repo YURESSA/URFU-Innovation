@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from flask import Blueprint, request, session, jsonify
 from flask import session as flask_session
+from sqlalchemy.orm import joinedload
 
 from ..controllers.AdminManager import AdminManager
 from ..controllers.TestManager import TestManager, get_tests
@@ -229,6 +230,125 @@ def admin_delete_disc_tests():
         db_session.commit()
 
         return jsonify({"success": True, "deleted_tests": deleted_count}), 200
+
+
+@test_bp.route('/user-tests', methods=['GET'])
+def get_user_tests():
+    telegram_id = request.args.get('telegram_id')
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+
+    current_user = session.get('admin_username')
+    from ..controllers.AdminManager import AdminManager
+    admin_manager = AdminManager(SessionLocal)
+    if not current_user or not admin_manager.is_admin(current_user):
+        return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
+
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d") if start_date_str else None
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d") + timedelta(days=1) if end_date_str else None
+    except ValueError:
+        return jsonify({"success": False, "message": "Неверный формат даты"}), 400
+
+    users_dict = {}
+
+    from ..controllers.TestManager import TestManager
+    test_manager = TestManager(SessionLocal)
+    roles_dict = test_manager.get_roles_and_descriptions()
+    roles = [v["role_in_team"] for v in roles_dict.values()]
+
+    with SessionLocal() as db_session:
+        # Загружаем все тесты с пользователем и результатами / ответами
+        query = db_session.query(UserTest).options(
+            joinedload(UserTest.user),
+            joinedload(UserTest.results),  # DISC
+            joinedload(UserTest.answers)  # BELBIN
+        )
+
+        if telegram_id:
+            query = query.join(User).filter(User.telegram_id == telegram_id)
+        else:
+            query = query.join(User)
+
+        if start_date:
+            query = query.filter(UserTest.timestamp >= start_date)
+        if end_date:
+            query = query.filter(UserTest.timestamp < end_date)
+
+        query = query.order_by(UserTest.timestamp.desc())
+        tests = query.all()
+
+        for ut in tests:
+            user = ut.user
+            key = user.telegram_id
+            if key not in users_dict:
+                users_dict[key] = {
+                    "telegram_id": user.telegram_id,
+                    "full_name": user.full_name,
+                    "phone_number": user.phone_number,
+                    "tests": []
+                }
+
+            # Формируем данные теста
+            test_data = {
+                "test_name": getattr(ut.test_id, "display_name", str(ut.test_id)),
+                "timestamp": ut.timestamp.strftime("%a, %d %b %Y %H:%M:%S GMT"),
+                "sections": {}
+            }
+
+            # DISC: берём из UserTestResult
+            if hasattr(ut, "results") and ut.results:
+                test_data["sections"] = {r.scale: r.value for r in ut.results}
+
+            # BELBIN: берём из answers через роли
+            elif hasattr(ut, "answers") and ut.answers:
+                test_data["sections"] = {role: getattr(ut.answers, f"section{i + 1}")
+                                         for i, role in enumerate(roles)}
+
+            users_dict[key]["tests"].append(test_data)
+
+    return jsonify({"success": True, "results": list(users_dict.values())}), 200
+
+
+@test_bp.route('/user-tests', methods=['DELETE'])
+def delete_user_tests():
+    telegram_id = request.args.get('telegram_id')
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+
+    current_user = session.get('admin_username')
+    from ..controllers.AdminManager import AdminManager
+    admin_manager = AdminManager(SessionLocal)
+    if not current_user or not admin_manager.is_admin(current_user):
+        return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
+
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d") if start_date_str else None
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d") + timedelta(days=1) if end_date_str else None
+    except ValueError:
+        return jsonify({"success": False, "message": "Неверный формат даты"}), 400
+
+    with SessionLocal() as db_session:
+        query = db_session.query(UserTest).join(User)
+
+        if telegram_id:
+            query = query.filter(User.telegram_id == telegram_id)
+        if start_date:
+            query = query.filter(UserTest.timestamp >= start_date)
+        if end_date:
+            query = query.filter(UserTest.timestamp < end_date)
+
+        tests_to_delete = query.all()
+        deleted_count = 0
+
+        for test in tests_to_delete:
+            # удаляются и DISC, и BELBIN через cascade
+            db_session.delete(test)
+            deleted_count += 1
+
+        db_session.commit()
+
+    return jsonify({"success": True, "deleted_tests": deleted_count}), 200
 
 
 @test_bp.route('/save-test-results', methods=['GET'])

@@ -1,8 +1,6 @@
 from flask import request, session, jsonify
 
 
-
-
 def process_post_request(user_manager, test_manager, flask_session):
     data = request.json
     telegram_id = session.get('telegram_id')
