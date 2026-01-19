@@ -12,6 +12,10 @@ class UserManager:
     def __init__(self, session_factory=None):
         self.session_factory = session_factory or SessionLocal
 
+    def get_user_by_telegram(self, telegram_id: str):
+        with self.session_factory() as session:
+            return session.scalars(select(User).where(User.telegram_id == telegram_id)).first()
+
     def get_user_id(self, telegram_id: str):
         with self.session_factory() as session:
             user = session.scalars(select(User).where(User.telegram_id == telegram_id)).first()
@@ -21,12 +25,14 @@ class UserManager:
         with self.session_factory() as session:
             return session.scalars(select(User).where(User.telegram_id == telegram_id)).first() is not None
 
-    def register_user(self, full_name: str, phone_number: str, telegram_id: str):
+    def register_user(self, full_name, phone_number, telegram_id, password):
         with self.session_factory() as session:
-            if session.scalars(select(User).where(User.telegram_id == telegram_id)).first():
-                return True, "Пользователь с таким Telegram ID уже существует."
+            existing_user = session.scalars(select(User).where(User.telegram_id == telegram_id)).first()
+            if existing_user:
+                return False, "Пользователь с таким Telegram ID уже существует."
 
             user = User(full_name=full_name, phone_number=phone_number, telegram_id=telegram_id)
+            user.set_password(password)
             session.add(user)
             session.commit()
             return True, "Пользователь успешно зарегистрирован."
