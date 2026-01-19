@@ -123,3 +123,53 @@ def create_disc_excel_file(data: list):
         ])
 
     return wb, ws
+
+
+from openpyxl.styles import PatternFill
+
+def highlight_belbin_cells(ws, belbin_start_col, belbin_end_col):
+    green_fill = PatternFill(
+        start_color="FF99FFCC",
+        end_color="FF99FFCC",
+        fill_type="solid"
+    )
+    red_fill = PatternFill(
+        start_color="FFFF7C80",
+        end_color="FFFF7C80",
+        fill_type="solid"
+    )
+
+    for row in ws.iter_rows(
+        min_row=3,               # данные начинаются с 3 строки
+        max_row=ws.max_row,
+        min_col=belbin_start_col,
+        max_col=belbin_end_col
+    ):
+        scores = [
+            cell.value for cell in row
+            if isinstance(cell.value, (int, float))
+        ]
+
+        if not scores:
+            continue
+
+        top_3_values = sorted(scores, reverse=True)[:3]
+
+        for cell in row:
+            if isinstance(cell.value, (int, float)):
+                if cell.value in top_3_values:
+                    cell.fill = green_fill
+                elif 0 <= cell.value <= 3:
+                    cell.fill = red_fill
+
+def auto_adjust_column_width(ws, min_width=10, max_width=40):
+    for col in ws.columns:
+        max_length = 0
+        col_letter = get_column_letter(col[0].column)
+
+        for cell in col:
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+
+        adjusted_width = min(max(max_length + 2, min_width), max_width)
+        ws.column_dimensions[col_letter].width = adjusted_width

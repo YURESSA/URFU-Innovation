@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from flask import Blueprint, request, session, jsonify
 from flask import session as flask_session
+from openpyxl.styles import Border, Side
 from sqlalchemy.orm import joinedload
 
 from ..controllers.AdminManager import AdminManager
@@ -15,7 +16,8 @@ from ..models.user_test_result import UserTestResult
 from ..paths import BELBIN_TEST_PATH
 from ..services.belbin_service import process_post_request, get_questions
 from ..services.disc_service import get_disc_test_questions, calculate_disc_scores, save_disc_test_results
-from ..services.excel_service import create_excel_file, adjust_column_widths, save_and_send_file, create_disc_excel_file
+from ..services.excel_service import create_excel_file, adjust_column_widths, save_and_send_file, \
+    create_disc_excel_file, highlight_belbin_cells, auto_adjust_column_width
 
 test_bp = Blueprint('test', __name__)
 user_manager = UserManager(session_factory=SessionLocal)
@@ -181,7 +183,6 @@ def admin_disc_test_results():
         return jsonify({"success": True, "results": table_list}), 200
 
 
-
 @test_bp.route('/disc-test-results', methods=['DELETE'])
 def admin_delete_disc_tests():
     current_user = flask_session.get('admin_username')
@@ -262,7 +263,7 @@ def get_user_tests():
         query = db_session.query(UserTest).options(
             joinedload(UserTest.user),
             joinedload(UserTest.results),  # DISC
-            joinedload(UserTest.answers)   # BELBIN
+            joinedload(UserTest.answers)  # BELBIN
         ).join(User)
 
         if telegram_id:
@@ -362,7 +363,6 @@ def delete_user_tests():
     return jsonify({"success": True, "deleted_tests": deleted_count}), 200
 
 
-
 @test_bp.route('/save-test-results', methods=['GET'])
 def save_test_results():
     data = request.form
@@ -433,3 +433,143 @@ def save_disc_test_results_excel():
         wb, ws = create_disc_excel_file(excel_data)
         adjust_column_widths(ws)
         return save_and_send_file(wb)
+
+thin_border = Border(
+    left=Side(style='thin'),
+    right=Side(style='thin'),
+    top=Side(style='thin'),
+    bottom=Side(style='thin')
+)
+
+@test_bp.route('/user-tests/export', methods=['GET'])
+def export_user_tests_excel():
+    current_user = session.get('admin_username')
+
+    from ..controllers.TestManager import TestManager
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment
+    from flask import send_file
+    import tempfile
+
+    # ---- CHECK ADMIN (если нужно) ----
+    # admin_manager = AdminManager(SessionLocal)
+    # if not current_user or not admin_manager.is_admin(current_user):
+    #     return jsonify({"success": False, "message": "Только администраторы"}), 403
+
+    test_manager = TestManager(SessionLocal)
+    roles_dict = test_manager.get_roles_and_descriptions()
+    belbin_roles = [v["role_in_team"] for v in roles_dict.values()]
+    disc_roles = [
+        "D\n(доминирование)",
+        "I\n(влияние)",
+        "S\n(устойчивость)",
+        "C\n(сознательность)"
+    ]
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "User tests"
+
+    # ---------- HEADER (2 ROWS) ----------
+    ws.append([
+        "ФИО", "Номер телефона", "Telegram ID",
+        *["BELBIN"] * len(belbin_roles),
+        *["DISC"] * len(disc_roles)
+    ])
+
+    disc_scales = ["D", "I", "S", "C"]
+
+    ws.append([
+        "", "", "",
+        *belbin_roles,
+        *disc_roles
+    ])
+
+    # Объединяем пользовательские поля
+    ws.merge_cells(start_row=1, start_column=1, end_row=2, end_column=1)
+    ws.merge_cells(start_row=1, start_column=2, end_row=2, end_column=2)
+    ws.merge_cells(start_row=1, start_column=3, end_row=2, end_column=3)
+
+    # Объединяем BELBIN
+    belbin_start = 4
+    belbin_end = belbin_start + len(belbin_roles) - 1
+    ws.merge_cells(start_row=1, start_column=belbin_start, end_row=1, end_column=belbin_end)
+
+    # Объединяем DISC
+    disc_start = belbin_end + 1
+    disc_end = disc_start + len(disc_roles) - 1
+    ws.merge_cells(start_row=1, start_column=disc_start, end_row=1, end_column=disc_end)
+
+    # Центрирование
+    for col in range(1, disc_end + 1):
+        ws.cell(row=1, column=col).alignment = Alignment(horizontal="center", vertical="center")
+        ws.cell(row=2, column=col).alignment = Alignment(horizontal="center", vertical="center")
+
+    # ---------- DATA ----------
+    users_map = {}
+
+    with SessionLocal() as db:
+        tests = db.query(UserTest).options(
+            joinedload(UserTest.user),
+            joinedload(UserTest.results),
+            joinedload(UserTest.answers)
+        ).all()
+
+        for ut in tests:
+            user = ut.user
+            uid = user.user_id
+
+            if uid not in users_map:
+                users_map[uid] = {
+                    "full_name": user.full_name,
+                    "phone_number": user.phone_number,
+                    "telegram_id": user.telegram_id,
+                    "belbin": {},
+                    "disc": {}
+                }
+
+            if ut.test_id.name == "BELBIN" and ut.answers:
+                users_map[uid]["belbin"] = {
+                    role: getattr(ut.answers, f"section{i + 1}")
+                    for i, role in enumerate(belbin_roles)
+                }
+
+            elif ut.test_id.name == "DISC" and ut.results:
+                users_map[uid]["disc"] = {
+                    r.scale: r.value for r in ut.results
+                }
+
+    # ---------- ROWS ----------
+    for user in users_map.values():
+        row = [
+            user["full_name"],
+            user["phone_number"],
+            user["telegram_id"],
+        ]
+
+        # BELBIN
+        for role in belbin_roles:
+            row.append(user["belbin"].get(role))
+
+
+        # DISC
+        for scale in disc_scales:
+            row.append(user["disc"].get(scale))
+
+        ws.append(row)
+
+    belbin_start_col = 4
+    belbin_end_col = belbin_start_col + len(belbin_roles) - 1
+
+    highlight_belbin_cells(ws, belbin_start_col, belbin_end_col)
+    # ---------- SAVE ----------
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
+    auto_adjust_column_width(ws)
+    wb.save(tmp.name)
+
+    return send_file(
+        tmp.name,
+        as_attachment=True,
+        download_name="user_tests.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
