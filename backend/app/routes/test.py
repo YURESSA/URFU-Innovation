@@ -235,6 +235,7 @@ def admin_delete_disc_tests():
 @test_bp.route('/user-tests', methods=['GET'])
 def get_user_tests():
     telegram_id = request.args.get('telegram_id')
+    test_name = request.args.get('test_name')  # новый параметр
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
 
@@ -255,25 +256,29 @@ def get_user_tests():
     from ..controllers.TestManager import TestManager
     test_manager = TestManager(SessionLocal)
     roles_dict = test_manager.get_roles_and_descriptions()
-    roles = [v["role_in_team"] for v in roles_dict.values()]
+    belbin_roles = [v["role_in_team"] for v in roles_dict.values()]
 
     with SessionLocal() as db_session:
-        # Загружаем все тесты с пользователем и результатами / ответами
         query = db_session.query(UserTest).options(
             joinedload(UserTest.user),
             joinedload(UserTest.results),  # DISC
-            joinedload(UserTest.answers)  # BELBIN
-        )
+            joinedload(UserTest.answers)   # BELBIN
+        ).join(User)
 
         if telegram_id:
-            query = query.join(User).filter(User.telegram_id == telegram_id)
-        else:
-            query = query.join(User)
+            query = query.filter(User.telegram_id == telegram_id)
 
         if start_date:
             query = query.filter(UserTest.timestamp >= start_date)
         if end_date:
             query = query.filter(UserTest.timestamp < end_date)
+
+        if test_name:
+            try:
+                enum_value = TestEnum[test_name]
+                query = query.filter(UserTest.test_id == enum_value)
+            except KeyError:
+                return jsonify({"success": False, "message": f"Тест {test_name} не найден"}), 400
 
         query = query.order_by(UserTest.timestamp.desc())
         tests = query.all()
@@ -289,21 +294,20 @@ def get_user_tests():
                     "tests": []
                 }
 
-            # Формируем данные теста
             test_data = {
                 "test_name": getattr(ut.test_id, "display_name", str(ut.test_id)),
                 "timestamp": ut.timestamp.strftime("%a, %d %b %Y %H:%M:%S GMT"),
                 "sections": {}
             }
 
-            # DISC: берём из UserTestResult
-            if hasattr(ut, "results") and ut.results:
+            if ut.test_id.name == "DISC" and hasattr(ut, "results") and ut.results:
                 test_data["sections"] = {r.scale: r.value for r in ut.results}
 
-            # BELBIN: берём из answers через роли
-            elif hasattr(ut, "answers") and ut.answers:
-                test_data["sections"] = {role: getattr(ut.answers, f"section{i + 1}")
-                                         for i, role in enumerate(roles)}
+            elif ut.test_id.name == "BELBIN" and hasattr(ut, "answers") and ut.answers:
+                test_data["sections"] = {
+                    role: getattr(ut.answers, f"section{i + 1}")
+                    for i, role in enumerate(belbin_roles)
+                }
 
             users_dict[key]["tests"].append(test_data)
 
@@ -313,6 +317,7 @@ def get_user_tests():
 @test_bp.route('/user-tests', methods=['DELETE'])
 def delete_user_tests():
     telegram_id = request.args.get('telegram_id')
+    test_name = request.args.get('test_name')  # новый параметр
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
 
@@ -337,18 +342,25 @@ def delete_user_tests():
             query = query.filter(UserTest.timestamp >= start_date)
         if end_date:
             query = query.filter(UserTest.timestamp < end_date)
+        if test_name:
+            from ..models.test import TestEnum
+            try:
+                enum_value = TestEnum[test_name]
+                query = query.filter(UserTest.test_id == enum_value)
+            except KeyError:
+                return jsonify({"success": False, "message": f"Тест {test_name} не найден"}), 400
 
         tests_to_delete = query.all()
         deleted_count = 0
 
         for test in tests_to_delete:
-            # удаляются и DISC, и BELBIN через cascade
             db_session.delete(test)
             deleted_count += 1
 
         db_session.commit()
 
     return jsonify({"success": True, "deleted_tests": deleted_count}), 200
+
 
 
 @test_bp.route('/save-test-results', methods=['GET'])
