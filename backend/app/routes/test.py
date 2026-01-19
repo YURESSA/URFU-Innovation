@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Blueprint, request, session, jsonify
 from flask import session as flask_session
@@ -38,12 +38,15 @@ def processing_form():
 def disc_test():
     if request.method == 'POST':
         data = request.get_json()
-
+        telegram_id = session.get('telegram_id')
+        if not telegram_id:
+            return jsonify(
+                {"success": False, "message": "Пользователь не авторизован!"}), 401
         if not data or "answers" not in data:
             return {"error": "Invalid payload"}, 400
 
         result = calculate_disc_scores(data)
-        user_id = user_manager.get_user_id(telegram_id=session.get('telegram_id'))
+        user_id = user_manager.get_user_id(telegram_id)
         save_disc_test_results(
             db=SessionLocal(),
             user_id=user_id,
@@ -57,17 +60,15 @@ def disc_test():
 
 @test_bp.route('/get-test-results', methods=['GET'])
 def get_test_results():
-    data = request.form
-    telegram_id = data.get('telegram_id')
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
+    telegram_id = request.args.get('telegram_id')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
     test_name = "BELBIN"
     current_user = session.get('admin_username')
     from ..controllers.AdminManager import AdminManager
     admin_manager = AdminManager(SessionLocal)
     if not current_user or not admin_manager.is_admin(current_user):
         return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
-
     results = test_manager.get_filtered_results(telegram_id, test_name, start_date, end_date)
     return jsonify({"success": True, "results": results}), 200
 
@@ -94,16 +95,17 @@ def admin_delete_belbin():
     with SessionLocal() as db_session:
         query = db_session.query(UserTest)
 
-        # Если указана только start_date — берём до самой свежей
         if start_date and not end_date:
             query = query.filter(UserTest.timestamp >= start_date,
                                  UserTest.test_id == TestEnum.BELBIN)
-        # Если указана только end_date — берём от самой старой до end_date
+
         elif end_date and not start_date:
+            end_date = end_date + timedelta(days=1)
             query = query.filter(UserTest.timestamp <= end_date,
                                  UserTest.test_id == TestEnum.BELBIN)
-        # Если обе указаны — диапазон между start_date и end_date
+
         elif start_date and end_date:
+            end_date = end_date + timedelta(days=1)
             query = query.filter(UserTest.timestamp >= start_date, UserTest.timestamp <= end_date,
                                  UserTest.test_id == TestEnum.BELBIN)
 
@@ -130,8 +132,8 @@ def admin_disc_test_results():
         return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
 
     telegram_id = request.args.get('telegram_id')
-    start_date = request.args.get('start_date')  # YYYY-MM-DD
-    end_date = request.args.get('end_date')  # YYYY-MM-DD
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
     try:
         start_date = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
@@ -140,31 +142,43 @@ def admin_disc_test_results():
         return jsonify({"success": False, "message": "Неверный формат даты"}), 400
 
     with SessionLocal() as db_session:
-        query = db_session.query(UserTest, User, UserTestResult).join(User).join(UserTestResult)
+        query = (
+            db_session
+            .query(UserTest, User, UserTestResult)
+            .join(User, User.user_id == UserTest.user_id)
+            .join(UserTestResult, UserTestResult.user_test_id == UserTest.user_test_id)
+        )
 
         if telegram_id:
             query = query.filter(User.telegram_id == telegram_id)
 
         if start_date:
             query = query.filter(UserTest.timestamp >= start_date)
+
         if end_date:
-            query = query.filter(UserTest.timestamp <= end_date)
+            end_date += timedelta(days=1)
+            query = query.filter(UserTest.timestamp < end_date)
 
         table = {}
         for user_test, user, result in query.all():
             key = user_test.user_test_id
             if key not in table:
                 table[key] = {
-                    "user_test_id": user_test.user_test_id,
+                    "test_name": user_test.test_id.display_name,
                     "telegram_id": user.telegram_id,
-                    "timestamp": user_test.timestamp.isoformat(),
-                    "scores": {}
+                    "full_name": user.full_name,
+                    "phone_number": user.phone_number,
+                    "timestamp": user_test.timestamp.strftime(
+                        "%a, %d %b %Y %H:%M:%S GMT"
+                    ),
+                    "sections": {}
                 }
-            table[key]["scores"][result.scale] = result.value
+            table[key]["sections"][result.scale] = result.value
 
         table_list = list(table.values())
 
         return jsonify({"success": True, "results": table_list}), 200
+
 
 
 @test_bp.route('/disc-test-results', methods=['DELETE'])
@@ -189,16 +203,16 @@ def admin_delete_disc_tests():
     with SessionLocal() as db_session:
         query = db_session.query(UserTest)
 
-        # Если указана только start_date — берём до самой свежей
         if start_date and not end_date:
             query = query.filter(UserTest.timestamp >= start_date,
                                  UserTest.test_id == TestEnum.DISC)
-        # Если указана только end_date — берём от самой старой до end_date
         elif end_date and not start_date:
-            query = query.filter(UserTest.timestamp <= end_date,
+            end_date = end_date + timedelta(days=1)
+            query = query.filter(UserTest.timestamp < end_date,
                                  UserTest.test_id == TestEnum.DISC)
-        # Если обе указаны — диапазон между start_date и end_date
+
         elif start_date and end_date:
+            end_date = end_date + timedelta(days=1)
             query = query.filter(UserTest.timestamp >= start_date, UserTest.timestamp <= end_date,
                                  UserTest.test_id == TestEnum.DISC)
 
@@ -221,7 +235,6 @@ def admin_delete_disc_tests():
 def save_test_results():
     data = request.form
     telegram_id = data.get('telegram_id')
-    test_name = data.get('test_name')
     start_date = data.get('start_date')
     end_date = data.get('end_date')
 
@@ -263,7 +276,8 @@ def save_disc_test_results_excel():
         if start_date:
             query = query.filter(UserTest.timestamp >= start_date)
         if end_date:
-            query = query.filter(UserTest.timestamp <= end_date)
+            end_date += timedelta(days=1)
+            query = query.filter(UserTest.timestamp < end_date)
 
         table = {}
         for user_test, user, result in query.all():

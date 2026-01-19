@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import select, and_
 from sqlalchemy.orm import joinedload
@@ -74,7 +74,7 @@ class TestManager:
             query = select(UserTest).options(
                 joinedload(UserTest.user),
                 joinedload(UserTest.answers)
-            )
+            ).join(User)
 
             filters = []
 
@@ -96,12 +96,11 @@ class TestManager:
             if end_date:
                 end_dt = self._parse_date(end_date)
                 if end_dt:
-                    filters.append(UserTest.timestamp <= end_dt)
+                    end_dt += timedelta(days=1)  # включаем весь день
+                    filters.append(UserTest.timestamp < end_dt)
 
             if filters:
-                query = query.join(User).where(and_(*filters))
-            else:
-                query = query.join(User)
+                query = query.where(and_(*filters))
 
             query = query.order_by(UserTest.timestamp.desc())
             results = session.scalars(query).all()
