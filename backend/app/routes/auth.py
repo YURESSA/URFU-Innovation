@@ -231,11 +231,49 @@ def get_user_test(user_test_id):
 
         # ---------------- DISC / SCALE TESTS ----------------
         elif ut.results:
-            response_payload = {
-                "type": "SCALE",
-                "scales": {
-                    r.scale: r.value for r in ut.results
+            import json
+            import os
+
+            BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            REC_PATH = os.path.join(BASE_DIR, "data", "disc", "key_rec.json")
+
+            with open(REC_PATH, "r", encoding="utf-8") as f:
+                rec_data = json.load(f)
+
+            # собираем scores из БД
+            scores = {r.scale: r.value for r in ut.results}
+
+            # сортируем и формируем профиль
+            sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            profile = "".join([item[0] for item in sorted_scores])
+
+            first = profile[0]
+            second = profile[1]
+            fourth = profile[3]
+
+            recommendations = [
+                {
+                    "title": rec_data["titles"]["position_1"],
+                    "letter": first,
+                    "items": rec_data["letters"][first]["goal"]
+                },
+                {
+                    "title": rec_data["titles"]["position_2"],
+                    "letter": second,
+                    "items": rec_data["letters"][second]["tools"]
+                },
+                {
+                    "title": rec_data["titles"]["position_4"],
+                    "letter": fourth,
+                    "items": rec_data["letters"][fourth]["tools"]
                 }
+            ]
+
+            response_payload = {
+                "type": "DISC",
+                "scores": scores,
+                "profile": profile,
+                "recommendations": recommendations
             }
 
         # ---------------- NO DATA ----------------

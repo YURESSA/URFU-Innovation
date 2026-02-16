@@ -32,6 +32,13 @@ DISC_KEY = {
           (11, "A"), (12, "C"), (13, "D"), (14, "A"), (15, "D")]
 }
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REC_PATH = os.path.join(BASE_DIR, "data", "disc", "key_rec.json")
+
+
+def load_recommendations():
+    with open(REC_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def calculate_disc_scores(data):
     answers = {item["question_id"]: item["answer"] for item in data["answers"]}
@@ -45,13 +52,38 @@ def calculate_disc_scores(data):
 
     sorted_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
 
-    primary = sorted_scores[0][0]
-    secondary = sorted_scores[1][0] if sorted_scores[1][1] >= sorted_scores[0][1] - 2 else None
+    # формируем последовательность из 4 букв
+    profile = "".join([item[0] for item in sorted_scores])
+
+    # загружаем json рекомендаций
+    rec_data = load_recommendations()
+
+    first = profile[0]
+    second = profile[1]
+    fourth = profile[3]
+
+    recommendations = [
+        {
+            "title": rec_data["titles"]["position_1"],
+            "letter": first,
+            "items": rec_data["letters"][first]["goal"]
+        },
+        {
+            "title": rec_data["titles"]["position_2"],
+            "letter": second,
+            "items": rec_data["letters"][second]["tools"]
+        },
+        {
+            "title": rec_data["titles"]["position_4"],
+            "letter": fourth,
+            "items": rec_data["letters"][fourth]["tools"]
+        }
+    ]
 
     return {
         "scores": scores,
-        "primary": primary,
-        "secondary": secondary
+        "profile": profile,
+        "recommendations": recommendations
     }
 
 
