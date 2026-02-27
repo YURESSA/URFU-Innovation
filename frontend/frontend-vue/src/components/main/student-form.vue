@@ -1,41 +1,127 @@
 <template>
   <div class="form__wrapper" @click="emit('closeForm')">
     <div class="relative__wrapper" @click.stop>
-      <button class="close-form" @click="emit('closeForm')"><img src="@public/assets/main-page/cross-circle-svgrepo-com.svg" alt=""></button>
-      <div class="form">
-        <h3>Заполните данные</h3>
-        <form ref="studentForm" method="post" @submit="handleSubmit">
+      <button class="close-form" @click="emit('closeForm')">
+        <img src="@public/assets/main-page/cross-circle-svgrepo-com.svg" alt="">
+      </button>
+      
+      <!-- Форма входа -->
+      <div class="form" v-if="login">
+        <h3>Войдите в профиль</h3>
+        <form ref="loginForm" @submit.prevent="handleLoginSubmit">
+          <div class="input-wrapper">
+            <label for="telegram_id">Телеграм</label>
+            <input
+              type="text"
+              v-model="loginData.telegram_id"
+              name="telegram_id"
+              autocomplete="off"
+              placeholder="@UserName или @+79998881122"
+              required
+              @input="validateTelegramId('login')"
+              :class="{ 'invalid': !validations.login.telegramValid && loginData.telegram_id }">
+          </div>
+          
+          <div class="input-wrapper">
+            <label for="password">Пароль</label>
+            <input
+              type="password"
+              v-model="loginData.password"
+              name="password"
+              autocomplete="off"
+              placeholder="Введите ваш пароль"
+              required>
+          </div>
+          
+          <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+          
+          <button 
+            ref="loginButton" 
+            class="submit" 
+            type="submit" 
+            :disabled="!validations.login.telegramValid || isLoading">
+            <span>{{ isLoading ? 'Вход...' : 'Войти' }}</span>
+          </button>
+        </form>
+        
+        <p class="p__bold">
+          Нет аккаунта? 
+          <button class="switch-login" type="button" @click="switchToRegister">Зарегистрироваться</button>
+        </p>
+      </div>
+      
+      <!-- Форма регистрации -->
+      <div class="form" v-if="!login">
+        <h3>Регистрация</h3>
+        <form ref="registerForm" @submit.prevent="handleRegisterSubmit">
           <div class="input-wrapper">
             <label for="full_name">ФИО</label>
-            <input type="text" name="full_name" autocomplete="off" placeholder="Иванов Иван Иванович" required>
+            <input 
+              type="text" 
+              v-model="registerData.full_name"
+              name="full_name" 
+              autocomplete="off" 
+              placeholder="Иванов Иван Иванович" 
+              required>
           </div>
+          
           <div class="input-wrapper">
-            <label for="full_name">Номер телефона</label>
+            <label for="phone_number">Номер телефона</label>
             <input
-            type="tel"
-            v-model="phoneNumber"
-            name="phone_number"
-            autocomplete="off"
-            required
-            @input="validatePhoneNumber">
+              type="tel"
+              v-model="registerData.phone_number"
+              name="phone_number"
+              autocomplete="off"
+              placeholder="+7XXXXXXXXXX"
+              required
+              @input="validatePhoneNumber"
+              :class="{ 'invalid': !validations.register.phoneValid && registerData.phone_number.length > 2 }">
           </div>
+          
           <div class="input-wrapper">
-            <label for="full_name">Способ связи. Телеграмм или номер телефона</label>
+            <label for="telegram_id">Телеграм</label>
             <input
-            type="text"
-            class="contact-data"
-            v-model="telegramId"
-            name="telegram_id"
-            autocomplete="off"
-            placeholder="@UserName или @+79998881122"
-            required
-            @input="validateTelegramId">
+              type="text"
+              v-model="registerData.telegram_id"
+              name="telegram_id"
+              autocomplete="off"
+              placeholder="@UserName или @+79998881122"
+              required
+              @input="validateTelegramId('register')"
+              :class="{ 'invalid': !validations.register.telegramValid && registerData.telegram_id }">
           </div>
+          
+          <div class="input-wrapper">
+            <label for="password">Пароль</label>
+            <input
+              type="password"
+              v-model="registerData.password"
+              name="password"
+              autocomplete="off"
+              placeholder="Введите ваш пароль"
+              required
+              minlength="6">
+          </div>
+          
           <div class="approval">
-            <input type="checkbox" class="checkbox" required ><p class="p__bold"> Нажимая кнопку "Перейти к тесту" вы даёте свое согласие на <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf" target="_blank">обработку введенной персональной информации</a></p>
+            <input type="checkbox" class="checkbox" v-model="agreed" required>
+            <p class="p__bold">
+              Нажимая кнопку "Зарегистрироваться" вы даёте свое согласие на 
+              <a href="https://ozi.urfu.ru/fileadmin/user_upload/site_15891/ZI/UrFU_Polozhenie_o_personalnykh_dannykh.pdf" target="_blank">
+                обработку введенной персональной информации
+              </a>
+            </p>
           </div>
-          <p v-if="!validNumber || !validTelegram" class="error">{{ errorMessage }}</p>
-          <button ref="sumbitButton" class="sumbit" type="submit" :disabled="!validNumber || !validTelegram" ><span>Перейти к тесту</span></button>
+          
+          <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+          
+          <button 
+            ref="registerButton" 
+            class="submit" 
+            type="submit" 
+            :disabled="!validations.register.phoneValid || !validations.register.telegramValid || !agreed || isLoading">
+            <span>{{ isLoading ? 'Регистрация...' : 'Зарегистрироваться' }}</span>
+          </button>
         </form>
       </div>
     </div>
@@ -43,98 +129,212 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
-import axios from 'axios';
-import {useRouter} from 'vue-router';
-import { baseUrl } from '@/stores/store.js';
+import { ref, reactive, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useDataStore } from '@/stores/store.js';
 
 const router = useRouter();
-const studentForm = ref(null);
-const sumbitButton = ref(null);
-
+const dataStore = useDataStore();
 const props = defineProps(['testUrl']);
-const emit = defineEmits(['closeForm'])
+const emit = defineEmits(['closeForm']);
 
-const phoneNumber = ref('+7');
-const telegramId = ref('');
-const validNumber = ref(false);
-const validTelegram = ref(false);
-const errorMessage = ref('');
+// Состояние формы
+const login = ref(true);
+const agreed = ref(false);
+const isLoading = ref(false);
 
-const validatePhoneNumber = (event) =>{
-  let input = event.target.value;
-  if (!input.startsWith('+7')) {
-    input = '+7';
+// Данные форм
+const loginData = reactive({
+  telegram_id: '',
+  password: ''
+});
+
+const registerData = reactive({
+  full_name: '',
+  phone_number: '+7',
+  telegram_id: '',
+  password: ''
+});
+
+// Валидация
+const validations = reactive({
+  login: {
+    telegramValid: false
+  },
+  register: {
+    phoneValid: false,
+    telegramValid: false
   }
-  input = '+7' + input.slice(2).replace(/[^\d]/g, '');
+});
+
+// Ошибки из store
+const errorMessage = computed(() => dataStore.authError);
+
+// Ссылки на кнопки
+const loginButton = ref(null);
+const registerButton = ref(null);
+
+// Ссылки на формы
+const loginForm = ref(null);
+const registerForm = ref(null);
+
+// Методы валидации
+const validatePhoneNumber = (event) => {
+  let input = event.target.value;
+  
+  // Если поле пустое, начинаем с +7
+  if (!input || input === '') {
+    registerData.phone_number = '+7';
+    validations.register.phoneValid = false;
+    return;
+  }
+  
+  // Убеждаемся что начинается с +7
+  if (!input.startsWith('+7')) {
+    input = '+7' + input.replace(/[^\d]/g, '');
+  } else {
+    input = '+7' + input.slice(2).replace(/[^\d]/g, '');
+  }
+  
+  // Ограничиваем длину
   if (input.length > 12) {
     input = input.slice(0, 12);
   }
-  phoneNumber.value = input;
-  validNumber.value = phoneNumber.value.length === 12;
-  if(!validNumber.value){
-    errorMessage.value = 'Некорректный номер телефона'
-  } else {
-    errorMessage.value = '';
-  }
-}
+  
+  registerData.phone_number = input;
+  validations.register.phoneValid = registerData.phone_number.length === 12;
+};
 
-const validateTelegramId = (event) => {
-  let input = event.target.value;
+const validateTelegramId = (formType) => {
+  let input = formType === 'login' ? loginData.telegram_id : registerData.telegram_id;
+  
+  // Обработка ссылок
   if (input.startsWith('https://t.me/')) {
     input = '@' + input.slice(13);
   }
+  
+  // Удаляем пробелы и спецсимволы кроме @, _, +
+  input = input.replace(/[^a-zA-Z0-9_+@]/g, '');
+  
+  // Убеждаемся что начинается с @
+  if (input && !input.startsWith('@')) {
+    input = '@' + input;
+  }
+  
+  // Ограничиваем длину
   if (input.length > 33) {
     input = input.slice(0, 33);
   }
-  telegramId.value = input;
-  validTelegram.value = /^@[a-zA-Z0-9_+]{5,32}$/.test(input);
-
-  if (!validTelegram.value) {
-    errorMessage.value = 'Некорректный телеграмм';
+  
+  if (formType === 'login') {
+    loginData.telegram_id = input;
+    validations.login.telegramValid = /^@[a-zA-Z0-9_+]{5,32}$/.test(input);
   } else {
-    errorMessage.value = '';
+    registerData.telegram_id = input;
+    validations.register.telegramValid = /^@[a-zA-Z0-9_+]{5,32}$/.test(input);
   }
 };
 
-function handleSubmit(event) {
-  event.preventDefault();
-  document.body.classList.remove('modal-open');
-  const formData = new FormData(studentForm.value);
-  sumbitButton.value.disabled = true;
+// Переключение между формами
+const switchToRegister = () => {
+  login.value = false;
+  dataStore.clearAuthError();
+  
+  // Очищаем данные
+  loginData.telegram_id = '';
+  loginData.password = '';
+};
 
-  axios.post(`${baseUrl}/register-user`, formData, {
-    withCredentials: true,
-  })
-      .then(response => {
-        router.push(props.testUrl);
-      })
-      .catch(error => {
-        console.error('Произошла ошибка:', error);
-      })
-      .finally(() => {
-        sumbitButton.value.disabled = false;
-      });
-}
+const switchToLogin = () => {
+  login.value = true;
+  dataStore.clearAuthError();
+  
+  // Очищаем данные
+  registerData.full_name = '';
+  registerData.phone_number = '+7';
+  registerData.telegram_id = '';
+  registerData.password = '';
+  agreed.value = false;
+  
+  // Сбрасываем валидацию
+  validations.register.phoneValid = false;
+  validations.register.telegramValid = false;
+};
+
+// Обработчик входа
+const handleLoginSubmit = async () => {
+  if (!validations.login.telegramValid) {
+    return;
+  }
+  
+  isLoading.value = true;
+  document.body.classList.remove('modal-open');
+  
+  const formData = new FormData();
+  formData.append('telegram_id', loginData.telegram_id);
+  formData.append('password', loginData.password);
+  
+  const result = await dataStore.loginUser(formData);
+  
+  if (result.success) {
+    router.push(props.testUrl);
+    emit('closeForm');
+  }
+  
+  isLoading.value = false;
+};
+
+// Обработчик регистрации
+const handleRegisterSubmit = async () => {
+  if (!validations.register.phoneValid || !validations.register.telegramValid) {
+    return;
+  }
+  
+  if (!agreed.value) {
+    return;
+  }
+  
+  isLoading.value = true;
+  document.body.classList.remove('modal-open');
+  
+  const formData = new FormData();
+  formData.append('full_name', registerData.full_name);
+  formData.append('phone_number', registerData.phone_number);
+  formData.append('telegram_id', registerData.telegram_id);
+  formData.append('password', registerData.password);
+  
+  const result = await dataStore.registerUser(formData);
+
+  console.log(result)
+  
+  if (result.success) {
+    alert('Регистрация успешна! Теперь вы можете войти.');
+    switchToLogin();
+  }
+  
+  isLoading.value = false;
+};
 </script>
 
 <style scoped>
 .form__wrapper {
-  position: absolute;
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;
-
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
-
   background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
 }
 
-.relative__wrapper{
+.relative__wrapper {
   position: relative;
+  width: 90%;
+  max-width: 590px;
+  margin: 0 auto;
 }
 
 .form {
@@ -142,127 +342,252 @@ function handleSubmit(event) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 40px;
-  padding: 60px 60px;
-
+  padding: 60px 60px 40px;
+  /* width: 100%;? */
+  max-width: 470px;
   background-color: whitesmoke;
   border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.form > h3 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  color: #333;
 }
 
 form {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.input-wrapper{
-  display: flex;
-  flex-direction: column;
   width: 100%;
 }
 
-label{
-  font-size: 20px;
-  font-weight: 600;
-  padding-left: 5px;
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 15px;
 }
 
-.contact-data::placeholder { 
-  font-size: 16px;
+label {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  padding-left: 5px;
+  color: #444;
 }
 
 input {
-  border: 1px solid #2b2a28;
-  border-radius: 7px;
-  height: 55px;
-  background-color: #c7c7c7;
-  padding: 5px 10px;
-  font-size: 24px;
-  margin-bottom: 30px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  height: 50px;
+  background-color: white;
+  padding: 5px 15px;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
 
-.approval{
+input:focus {
+  outline: none;
+  border-color: #57c0cf;
+  box-shadow: 0 0 0 3px rgba(87, 192, 207, 0.2);
+}
+
+input.invalid {
+  border-color: #ff6b6b;
+}
+
+input.invalid:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+input::placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
+.approval {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 450px;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 20px 0 10px;
+  text-align: left;
 }
 
-.checkbox{
-  width: 15px;
-  height: 20px;
+.approval > p {
   margin: 0;
 }
 
-.sumbit{
-  margin-top: 30px;
+.checkbox {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  margin-top: 2px;
+  cursor: pointer;
 }
 
-button {
-  border: 0.50px solid #2b2a28;
-  border-radius: 7px;
+.checkbox:checked {
+  accent-color: #57c0cf;
+}
+
+.submit {
+  border: none;
+  border-radius: 8px;
   background-color: #57c0cf;
-  padding: 10px 25px;
-}
-
-button:hover {
-  background-color: #2bd8f3;
-}
-
-button:disabled{
-  background-color: #6a858a;
-}
-
-.error{
-  height: 25px;
-  font-size: 20px;
+  padding: 12px 30px;
+  font-size: 16px;
   font-weight: 600;
-  color: brown;
-  margin: 0;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.close-form{
+.submit:hover:not(:disabled) {
+  background-color: #2bd8f3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(43, 216, 243, 0.3);
+}
+
+.submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.submit {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.switch-login {
+  all: unset;
+  color: #57c0cf;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  margin-left: 5px;
+  transition: color 0.3s ease;
+}
+
+.switch-login:hover {
+  color: #2bd8f3;
+}
+
+.p__bold {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  min-height: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ff6b6b;
+  margin: 10px 0 5px;
+}
+
+.close-form {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 40px;
   height: 40px;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 15px;
   padding: 0;
-  background-color: whitesmoke;
-  border: none;
+  background-color: white;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
 }
 
-.close-form:hover{
-  background-color: rgba(192, 192, 192, 0.623);
+.close-form:hover {
+  background-color: #f0f0f0;
+  transform: rotate(90deg);
+  border-color: #57c0cf;
 }
 
-.close-form:active{
-  background-color: rgba(146, 146, 146, 0.623);
+.close-form img {
+  width: 20px;
+  height: 20px;
 }
 
-@media screen and (max-width: 980px) {
-  .form{
-    padding: 20px 40px;
-    height: 580px;
-    max-width: 300px;
-    gap: 20px;
+/* Адаптивность */
+@media screen and (max-width: 768px) {
+  .form {
+    padding: 40px 30px 30px;
+    max-width: 400px;
   }
-  .error{
-    bottom: 52px;
+  
+  .form > h3 {
+    font-size: 24px;
   }
-  input{
+  
+  input {
+    height: 45px;
+    font-size: 15px;
+  }
+  
+  label {
+    font-size: 16px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .form {
+    padding: 30px 20px 25px;
+  }
+  
+  .form > h3 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  
+  .approval {
+    gap: 8px;
+  }
+  
+  .approval p {
     font-size: 14px;
-    height: 34px;
   }
-  .contact-data::placeholder { 
-  font-size: 11px;
+  
+  .close-form {
+    top: 10px;
+    right: 10px;
   }
-  h3{
-    width: max-content;
+}
+
+@media screen and (max-width: 360px) {
+  .form {
+    padding: 25px 15px 20px;
+  }
+  
+  .form > h3 {
+    font-size: 20px;
+  }
+  
+  input {
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .submit {
+    font-size: 16px;
+    padding: 10px 20px;
   }
 }
 </style>

@@ -38,6 +38,7 @@ const submitData = async () => {
   emit('updateResult')
   try {
     await store.fetchBelbinResult(props.result)
+    console.log('Результат', props.result)
     router.push('/belbin-result');
   } catch (error) {
     console.error('Ошибка при отправке данных:', error);

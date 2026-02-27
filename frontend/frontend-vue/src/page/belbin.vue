@@ -18,7 +18,7 @@
     Загрузка...
   </div>
 </template>
-
+  
 <script setup>
 import { useDataStore } from '@/stores/store.js';
 import { computed, ref, onMounted } from 'vue';
