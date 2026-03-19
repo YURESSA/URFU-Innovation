@@ -23,7 +23,6 @@ def process_post_request(user_manager, test_manager, flask_session):
     test_manager.save_user_answers(user_test_id, result)
     data_roles = {roles_data.get(k).get('role_in_team'): v for k, v in data_percentages.items()}
 
-    flask_session.pop('telegram_id', None)
 
     return jsonify({
         "success": True,

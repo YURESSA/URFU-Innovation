@@ -29,8 +29,9 @@ def register_user():
 
     if is_success:
         session['telegram_id'] = telegram_id
-
-    return jsonify({"success": is_success, "message": message}), 201
+        return jsonify({"success": True, "message": message}), 201
+    else:
+        return jsonify({"success": False, "message": message}), 400
 
 
 @auth_bp.route('/login-user', methods=['POST'])
