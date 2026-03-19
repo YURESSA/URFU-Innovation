@@ -153,10 +153,7 @@ export const useDataStore = defineStore('data', {
                 });
                 
                 console.log('Успешная регистрация:', response.data);
-<<<<<<< HEAD
-=======
                 return response.data
->>>>>>> 4ccb107e8c1c076b81ba9c9b2f0f8cccdba1ca65
 
             } catch (error) {
                 console.error('Ошибка регистрации:', error);
