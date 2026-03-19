@@ -4,6 +4,8 @@
     <diagram :result="diagresult"></diagram>
     <output-result :data="result"></output-result>
     <p class="p__bold">Личная консультация и ответы на вопросы по диагностике – Беспамятных Елена Владимировна, <a href="tel:+79022701569">+79022701569</a></p>
+    <button @click="ProfileData">Проверяем</button>
+    {{ data }}
   </div>
 </template>
 
@@ -16,11 +18,16 @@ import OutputResult from '@/components/belbin-result/output-result.vue';
 
 const store = useDataStore();
 const result = computed(() => store.getBelbinResult);
+const data = computed(() => store.getUser)
 
 const diagresult = Object.entries(result.value.all_roles).map(([key, value]) => ({
       name: key,
       pl: value
     }))
+
+function ProfileData() {
+  store.getProfileData();
+}
 </script>
 
 <style scoped>

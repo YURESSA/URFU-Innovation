@@ -223,7 +223,19 @@ export const useDataStore = defineStore('data', {
          */
         clearAuthError() {
             this.authError = null;
-        }
+        }, 
+
+        async getProfileData() {
+            try{
+                const response = await axios.get(`${baseUrl}/user-test`, {
+                    withCredentials: true,
+                });
+                this.user = response.data;
+            } catch (error){
+                console.log('Ошибка при получении данных:', error)
+                throw error;
+            }
+        },
     },
 
     getters: {
