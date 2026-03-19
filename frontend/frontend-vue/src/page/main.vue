@@ -11,6 +11,13 @@
           <img src="@public/assets/main-page/logo.svg" class="urfu" alt="инновационная инфраструктура УрФУ"/>
         </div>
       </div>
+      <div class="profile">
+        <router-link to="/profile">
+          <div class="profile-link">
+            <img src="/assets/main-page/user.png" alt="">
+          </div>
+        </router-link>
+      </div>
     </header>
     <main>
       <div v-for="(item, i) in tests" :key="i">
@@ -28,6 +35,7 @@ import { computed, ref} from 'vue';
 import { useDataStore } from '@/stores/store.js';
 import StudentForm from '@/components/main/student-form.vue';
 import TestPriview from '@/components/main/test-priview.vue'
+import { RouterLink } from 'vue-router';
 
 const isFormVisible = ref(false);
 const selectedTestUrl = ref('');
@@ -57,6 +65,7 @@ function closeForm() {
 }
 
 header{
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,6 +82,16 @@ header{
   position: relative;
   left: 10px;
   top: -50px;
+}
+
+.profile-link {
+  position: absolute;
+  top: 100px;
+  right: 70px;
+}
+
+.profile-link > img {
+  width: 40px;
 }
 
 .line{
@@ -95,6 +114,7 @@ main{
   justify-content: center;
   gap: 30px;
   flex-wrap: wrap;
+  padding-bottom: 50px;
 }
 
 .modal-open{
@@ -109,7 +129,7 @@ main{
     flex-direction: column-reverse;
   }
   .logo{
-    left: -10px;
+    left: -50%;
     top: 0px;
   }
   .line{
@@ -122,6 +142,11 @@ main{
     top: -80px;
     width: 90px;
     height: 50px;
+  }
+  .profile-link {
+    position: absolute;
+    top: 60px;
+    right: 25px;
   }
 }
 
