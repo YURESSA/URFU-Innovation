@@ -7,16 +7,18 @@ export const useDataStore = defineStore('data', {
     state: () => ({
         tests: [],
         belbin: [],
+        disc: [],
         belbinResult: [],
+        discResult: [],
         dataBase: [],
         admins: [],
+        userTest: null,
         user: null,
         isAuthenticated: false,
         authError: null,
     }),
     
     actions: {
-        // Существующие методы...
         async fetchTests() {
             try {
                 const response = await axios.get(`${baseUrl}/get-all-test`);
@@ -36,6 +38,17 @@ export const useDataStore = defineStore('data', {
                 console.error('Ошибка при получении данных:', error);
             }
         },
+
+        async fetchDisc() {
+            try {
+                const response = await axios.get(`${baseUrl}/disc-test`, {
+                    withCredentials: true,
+                });
+                this.disc = response.data;
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+            }
+        },
         
         async fetchBelbinResult(result) {
             try {
@@ -43,6 +56,17 @@ export const useDataStore = defineStore('data', {
                     withCredentials: true,
                 });
                 this.belbinResult = response.data;
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+            }
+        },
+        
+        async fetchDiscResult(result) {
+            try {
+                const response = await axios.post(`${baseUrl}/disc-test`, result, {
+                    withCredentials: true,
+                });
+                this.discResult = response.data;
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }
@@ -98,11 +122,6 @@ export const useDataStore = defineStore('data', {
             }
         },
 
-        // МЕТОДЫ ДЛЯ АВТОРИЗАЦИИ (без прямого localStorage)
-        
-        /**
-         * Вход пользователя
-         */
         async loginUser(formData) {
             this.authError = null;
             
@@ -115,7 +134,6 @@ export const useDataStore = defineStore('data', {
                 });
                 
                 if (response.data) {
-                    // Просто обновляем состояние, persist сам сохранит в localStorage
                     this.user = response.data.user || response.data;
                     this.isAuthenticated = true;
                     
@@ -138,9 +156,6 @@ export const useDataStore = defineStore('data', {
             }
         },
 
-        /**
-         * Регистрация пользователя
-         */
         async registerUser(formData) {
             this.authError = null;
             
@@ -175,17 +190,12 @@ export const useDataStore = defineStore('data', {
             }
         },
 
-        /**
-         * Выход пользователя
-         */
         async logoutUser() {
             try {
-                // Если есть эндпоинт для выхода
-                // await axios.post(`${baseUrl}/api/logout`, {}, {
-                //     withCredentials: true,
-                // });
+                await axios.post(`${baseUrl}/logout-user`, {}, {
+                    withCredentials: true,
+                });
                 
-                // Просто очищаем состояние, persist сам обновит localStorage
                 this.user = null;
                 this.isAuthenticated = false;
                 this.authError = null;
@@ -196,58 +206,57 @@ export const useDataStore = defineStore('data', {
             }
         },
 
-        /**
-         * Проверка авторизации при загрузке приложения
-         * Теперь просто проверяем, есть ли данные в state (persist уже восстановил их)
-         */
-        checkAuth() {
-            // persist уже восстановил состояние из localStorage
-            // Просто логируем для отладки
-            if (this.isAuthenticated) {
-                console.log('Пользователь авторизован:', this.user);
-            } else {
-                console.log('Пользователь не авторизован');
-            }
-        },
-
-        /**
-         * Обновление данных пользователя
-         */
-        updateUserData(userData) {
-            this.user = { ...this.user, ...userData };
-            // persist сам сохранит изменения
-        },
-
-        /**
-         * Очистка ошибок авторизации
-         */
-        clearAuthError() {
-            this.authError = null;
-        }, 
-
-        async getProfileData() {
+        async getUserTestData() {
             try{
                 const response = await axios.get(`${baseUrl}/user-test`, {
                     withCredentials: true,
                 });
-                this.user = response.data;
+                this.userTest = response.data;
+                this.user.tests = response.data.tests;
             } catch (error){
                 console.log('Ошибка при получении данных:', error)
                 throw error;
             }
         },
+
+        async checkAuth() {
+            console.log('Проверка авторизации: isAuthenticated = ', this.isAuthenticated);
+            if (this.isAuthenticated) {
+                try {
+                    await this.getUserTestData();
+                    return true;
+                } catch (e) {
+                    console.log('Ошибка поймана, очищаю данные');
+                    this.clearData();
+                    return false;
+                }
+            }
+            // console.log('isAuthenticated false, запрос не отправлен');
+            return false;
+        },
+
+
+        clearData() {
+            this.belbinResult = [];
+            this.dataBase = [];
+            this.admins = [];
+            this.userTest = null;
+            this.user = null;
+            this.isAuthenticated = false;
+            this.authError = null;
+        }
     },
 
     getters: {
-        // Существующие геттеры...
         getTests: (state) => state.tests,
         getBelbin: (state) => state.belbin,
+        getDisc: (state) => state.disc,
         getBelbinResult: (state) => state.belbinResult,
+        getDiscResult: (state) => state.discResult,
         getDataBase: (state) => state.dataBase,
         getAdmins: (state) => state.admins,
-        
-        // Геттеры авторизации
         getUser: (state) => state.user,
+        getUserTest: (state) => state.userTest,
         getIsAuthenticated: (state) => state.isAuthenticated,
         getAuthError: (state) => state.authError,
         

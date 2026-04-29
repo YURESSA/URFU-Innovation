@@ -1,20 +1,25 @@
 <template>
-  <div v-if="data"> <router-view /></div>
-  <div v-else>Загрузка...</div>
+  <div v-if="isReady">
+    <router-view />
+  </div>
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useDataStore } from '@/stores/store.js';
 
 const store = useDataStore();
+const isReady = ref(false); // Новый флаг
 
-onMounted(() => {
-  store.fetchTests();
+onMounted(async () => {
+  try {
+    // Выполняем параллельно для скорости
+    await Promise.all([
+      store.fetchTests(),
+      store.checkAuth()
+    ]);
+  } finally {
+    isReady.value = true; // Теперь приложение готово
+  }
 });
-
-const data = computed(() => store.getTests);
 </script>
-
-<style scoped>
-</style>

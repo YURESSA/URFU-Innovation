@@ -1,16 +1,19 @@
 @font-face {
   font-family: 'INNOURFU';
   src: url('/fonts/URFU.TTF');
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'PF Bulletin Sans Pro';
   src: url('/fonts/PFBulletinSansPro-Black.ttf');
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'PF Bulletin Sans Pro Regular';
   src: url('/fonts/PFBulletinSansPro-Regular.ttf');
+  font-display: swap;
 }
 
 :root {

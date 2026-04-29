@@ -71,12 +71,6 @@ header{
   left: 180px;
 }
 
-main{
-  display: flex;
-  justify-content: center;
-  width: 100vw;
-}
-
 .description{
   display: flex;
   flex-direction: column;

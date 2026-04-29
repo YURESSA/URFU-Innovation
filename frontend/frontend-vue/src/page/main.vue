@@ -12,11 +12,9 @@
         </div>
       </div>
       <div class="profile">
-        <router-link to="/profile">
-          <div class="profile-link">
-            <img src="/assets/main-page/user.png" alt="">
-          </div>
-        </router-link>
+        <div @click="handleProfileClick" class="profile-link" style="cursor: pointer;">
+          <img src="/assets/main-page/user.png" alt="Профиль">
+        </div>
       </div>
     </header>
     <main>
@@ -35,12 +33,22 @@ import { computed, ref} from 'vue';
 import { useDataStore } from '@/stores/store.js';
 import StudentForm from '@/components/main/student-form.vue';
 import TestPriview from '@/components/main/test-priview.vue'
-import { RouterLink } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const isFormVisible = ref(false);
 const selectedTestUrl = ref('');
 const store = useDataStore();
 const tests = computed(() => store.getTests);
+const isAuthenticated = computed(() => store.isAuthenticated);
+const router = useRouter();
+
+function handleProfileClick() {
+  if (isAuthenticated.value) {
+    router.push('/profile');
+  } else {
+    openForm('/profile');
+  }
+}
 
 function openForm(testUrl) {
   isFormVisible.value = true;

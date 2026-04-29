@@ -4,6 +4,9 @@ import Belbin from '@/page/belbin.vue';
 import BelbinResult from '@/page/belbin-result.vue';
 import Admin from '@/page/admin-login.vue';
 import AdminMain from '@/page/admin-main.vue';
+import Profile from '@/page/profile.vue';
+import Disc from '@/page/disc.vue';
+import DiscResult from '@/page/disc-result.vue';
 
 const routes = [
     {
@@ -17,9 +20,19 @@ const routes = [
         component: Belbin,
     },
     {
+        path: '/disc_test',
+        name: 'Disc',
+        component: Disc,
+    },
+    {
         path: '/belbin-result',
         name: 'BelbinResult',
         component: BelbinResult
+    },
+    {
+        path: '/disc-result',
+        name: 'DiscResult',
+        component: DiscResult
     },
     {
         path: '/admin',
@@ -30,6 +43,11 @@ const routes = [
         path: '/admin/database',
         name: 'AdminMain',
         component: AdminMain
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: Profile 
     }
 ];
 

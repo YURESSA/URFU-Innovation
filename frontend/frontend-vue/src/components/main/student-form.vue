@@ -277,7 +277,12 @@ const handleLoginSubmit = async () => {
   const result = await dataStore.loginUser(formData);
   
   if (result.success) {
-    router.push(props.testUrl);
+    if (props.testUrl) {
+      router.push(props.testUrl);
+    } else { 
+      router.push('/profile');
+    }
+    
     emit('closeForm');
   }
   
