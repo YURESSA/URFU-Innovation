@@ -15,17 +15,12 @@ import Diagram from '@/components/belbin-result/diagram.vue';
 import OutputResult from '@/components/belbin-result/output-result.vue';
 
 const store = useDataStore();
-const result = computed(() => store.getBelbinResult);
-const data = computed(() => store.getUserTest)
+const result = computed(() => store.getResult);
 
 const diagresult = Object.entries(result.value.all_roles).map(([key, value]) => ({
       name: key,
       pl: value
     }))
-
-function ProfileData() {
-  store.getUserTestData();
-}
 </script>
 
 <style scoped>

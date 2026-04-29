@@ -19,7 +19,7 @@
     </header>
     <main>
       <div v-for="(item, i) in tests" :key="i">
-        <test-priview :title="item.test_title" @click="openForm(item.test_url)"></test-priview>
+        <test-priview :title="item.test_title" @click="handleTestClick(item.test_url)"></test-priview>
       </div>
       <student-form
         v-if="isFormVisible"
@@ -41,6 +41,21 @@ const store = useDataStore();
 const tests = computed(() => store.getTests);
 const isAuthenticated = computed(() => store.isAuthenticated);
 const router = useRouter();
+
+// Проверяем, есть ли данные пользователя (авторизован ли он)
+const isAuth = computed(() => !!store.getUser);
+
+const handleTestClick = (testUrl) => {
+  if (isAuth.value) {
+    // Если авторизован — переходим на страницу теста
+    // Если testUrl это путь vue-router (например, '/disc'), используй push
+    router.push(testUrl);
+  } else {
+    // Если не авторизован — вызываем твою функцию открытия формы
+    // Можно также передать URL теста в store, чтобы после входа сразу редиректнуть
+    openForm(testUrl);
+  }
+};
 
 function handleProfileClick() {
   if (isAuthenticated.value) {

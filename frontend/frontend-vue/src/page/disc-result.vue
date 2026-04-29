@@ -82,7 +82,7 @@ const sortedScores = computed(() => {
 });
 
 const store = useDataStore();
-const data = computed(() => store.getDiscResult);
+const data = computed(() => store.getResult);
 </script>
 
 <style scoped>

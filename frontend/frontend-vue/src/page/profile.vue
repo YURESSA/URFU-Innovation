@@ -3,11 +3,18 @@
     <div class="container">
       <header>
         <div class="header__wrapper">
-          <div class="logo">
+          <div class="logo order-1">
             <router-link to="/"><img src="@public/assets/main-page/logo.svg" alt=""></router-link>
           </div>
-          <div class="title">
+          
+          <div class="title order-3">
             <h2>Личный кабинет</h2>
+          </div>
+        
+          <div class="logout-container order-2">
+            <button @click="handleLogout" class="btn-logout">
+              Выйти
+            </button>
           </div>
         </div>
       </header>
@@ -42,12 +49,13 @@
                 <h3 class="test-name">{{ test.test_name }}</h3>
               </div>
               <div class="test-card__action">
-                <router-link 
-                  :to="{ name: test.test_name === 'Тест DISC' ? 'DiscResult' : 'BelbinResult', params: { id: test.user_test_id }}" 
+                <button 
+                  @click="goToResult(test)" 
                   class="btn-view"
+                  :disabled="isLoading"
                 >
-                  Смотреть результат
-                </router-link>
+                  {{ isLoading ? 'Загрузка...' : 'Смотреть результат' }}
+                </button>
               </div>
             </div>
           </div>
@@ -65,15 +73,40 @@
 
 <script setup>
 import { useDataStore } from '@/stores/store';
-import { computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { computed, onMounted, ref } from 'vue';
 
 const store = useDataStore();
+const router = useRouter();
+const isLoading = ref(false);
 
 onMounted(() => {
   store.getUserTestData();
 });
 
+
 const user = computed(() => store.getUser);
+
+const goToResult = async (test) => {
+  try {
+    console.log(test.user_test_id)
+    isLoading.value = true;
+    await store.fetchSpecificTestData(test.user_test_id);
+    
+    const routeName = test.test_name === 'Тест DISC' ? 'DiscResult' : 'BelbinResult';
+    
+    router.push({ 
+      name: routeName, 
+      params: { id: test.user_test_id } 
+    });
+    
+  } catch (error) {
+    console.error("Ошибка при загрузке результатов:", error);
+    alert("не удалось загрузить результаты теста");
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 // Форматирование даты в привычный вид: 29.04.2026
 const formatDate = (dateString) => {
@@ -83,6 +116,17 @@ const formatDate = (dateString) => {
     month: '2-digit',
     year: 'numeric'
   });
+};
+
+const handleLogout = async () => {
+  try {
+    store.logoutUser();
+    router.push('/')
+  } catch (error) {
+    console.error("Ошибка при выходе:", error);
+    store.user = null;
+    router.push('/');
+  }
 };
 </script>
 
@@ -107,11 +151,49 @@ header{
   height: 150px;
 }
 
-.header__wrapper{
+/* Базовые стили для десктопа */
+.header__wrapper {
   width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; /* Позволяет элементам переноситься на мобилках */
+}
+
+/* Порядок по умолчанию (десктоп) */
+.order-1 { order: 1; width: 30%; }
+.order-3 { order: 2; width: 40%; text-align: center; } /* Титул в центре */
+.order-2 { order: 3; width: 30%; display: flex; justify-content: flex-end; }
+
+.logout-container {
+  width: 30%; /* Чтобы сбалансировать с логотипом */
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 2px solid #1a1a1a;
+  color: #1a1a1a;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+/* Фикс для мобилок */
+@media (max-width: 768px) {
+  .btn-logout {
+    padding: 5px 15px;
+    font-size: 12px;
+  }
 }
 
 .logo{
@@ -261,19 +343,50 @@ h2{
   .user-name { font-size: 32px; }
   .contact-grid { flex-direction: column; gap: 20px; }
   .test-card { flex-direction: column; align-items: flex-start; gap: 15px; }
-  .header__wrapper { flex-direction: column; align-items: flex-start; }
 }
 
 @media screen and (max-width: 980px) {
   .header__wrapper{
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
     padding-top: 40px;
   }
   img{
     width: 90px;
     /* height: 40px; */
+  }
+}
+
+/* Стили для мобильных устройств */
+@media (max-width: 768px) {
+  .header__wrapper {
+    padding: 20px 0;
+    height: auto;
+  }
+
+  /* Логотип слева */
+  .order-1 { 
+    order: 1; 
+    width: 50%; 
+  }
+
+  /* Кнопка выйти справа (второй элемент) */
+  .order-2 { 
+    order: 2; 
+    width: 50%; 
+    justify-content: flex-end;
+  }
+
+  /* Заголовок на новой строке (третий элемент) */
+  .order-3 { 
+    order: 3; 
+    width: 100%; 
+    text-align: left; 
+    margin-top: 20px;
+  }
+
+  .order-3 h2 {
+    height: auto;
+    font-size: 24px;
+    line-height: 1.2;
   }
 }
 </style>

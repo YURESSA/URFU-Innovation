@@ -5,13 +5,12 @@ export const baseUrl = import.meta.env.VITE_BASE_URL
 
 export const useDataStore = defineStore('data', {
     state: () => ({
-        tests: [],
-        belbin: [],
-        disc: [],
-        belbinResult: [],
-        discResult: [],
-        dataBase: [],
-        admins: [],
+        tests: null,
+        belbin: null,
+        disc: null,
+        testResult: null,
+        dataBase: null,
+        admins: null,
         userTest: null,
         user: null,
         isAuthenticated: false,
@@ -55,7 +54,7 @@ export const useDataStore = defineStore('data', {
                 const response = await axios.post(`${baseUrl}/belbin-test`, result, {
                     withCredentials: true,
                 });
-                this.belbinResult = response.data;
+                this.testResult = response.data;
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }
@@ -66,7 +65,7 @@ export const useDataStore = defineStore('data', {
                 const response = await axios.post(`${baseUrl}/disc-test`, result, {
                     withCredentials: true,
                 });
-                this.discResult = response.data;
+                this.testResult = response.data;
             } catch (error) {
                 console.error('Ошибка при получении данных:', error);
             }
@@ -74,7 +73,7 @@ export const useDataStore = defineStore('data', {
         
         async fetchDataBase() {
             try{
-                const response = await axios.get(`${baseUrl}/get-test-results`, {
+                const response = await axios.get(`${baseUrl}/user-tests`, {
                     withCredentials: true,
                 });
                 this.dataBase = response.data;
@@ -196,10 +195,7 @@ export const useDataStore = defineStore('data', {
                     withCredentials: true,
                 });
                 
-                this.user = null;
-                this.isAuthenticated = false;
-                this.authError = null;
-                
+                this.clearData();
                 console.log('Выход выполнен');
             } catch (error) {
                 console.error('Ошибка при выходе:', error);
@@ -213,6 +209,19 @@ export const useDataStore = defineStore('data', {
                 });
                 this.userTest = response.data;
                 this.user.tests = response.data.tests;
+            } catch (error){
+                console.log('Ошибка при получении данных:', error)
+                throw error;
+            }
+        },
+
+        async fetchSpecificTestData(testId) {
+            try{
+                const response = await axios.get(`${baseUrl}/user-test/${testId}`, {
+                    withCredentials: true,
+                });
+                this.testResult = response.data.test;
+                console.log(response)
             } catch (error){
                 console.log('Ошибка при получении данных:', error)
                 throw error;
@@ -237,9 +246,9 @@ export const useDataStore = defineStore('data', {
 
 
         clearData() {
-            this.belbinResult = [];
-            this.dataBase = [];
-            this.admins = [];
+            this.testResult = null;
+            this.dataBase = null;
+            this.admins = null;
             this.userTest = null;
             this.user = null;
             this.isAuthenticated = false;
@@ -251,8 +260,7 @@ export const useDataStore = defineStore('data', {
         getTests: (state) => state.tests,
         getBelbin: (state) => state.belbin,
         getDisc: (state) => state.disc,
-        getBelbinResult: (state) => state.belbinResult,
-        getDiscResult: (state) => state.discResult,
+        getResult: (state) => state.testResult,
         getDataBase: (state) => state.dataBase,
         getAdmins: (state) => state.admins,
         getUser: (state) => state.user,

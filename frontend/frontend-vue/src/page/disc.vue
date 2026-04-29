@@ -1,26 +1,6 @@
 <template>
   <div class="test-page" v-if="testData">
     <div class="container">
-      <!-- <header class="test-header">
-        <div class="header-content">
-          <div class="title-block">
-            <h1 class="main-title">ТЕСТ</h1>
-            <h1 class="sub-title">{{ testData.test_name }}</h1>
-          </div>
-          <div class="logo-block">
-            <img src="@public/assets/belbin/line1.svg" class="line1" alt="">
-            <a href="/"><img src="@public/assets/main-page/logo.svg" class="urfu" alt=""></a>
-            <img src="@public/assets/belbin/line2.svg" class="line2" alt="">
-          </div>
-        </div>
-        
-        <div class="description">
-          <p class="accent-text">ОПРЕДЕЛИ СВОЙ ТИП ЛИЧНОСТИ!</p>
-          <p class="instruction">
-            Внимательно прочитайте вопрос и выберите один вариант ответа, который наиболее точно описывает ваше поведение или предпочтения.
-          </p>
-        </div>
-      </header> -->
       <header>
         <div class="header__wrapper">
           <div class="title">
@@ -132,11 +112,10 @@ function prevQuestion() {
 }
 
 async function submitTest() {
-  // Преобразуем ответы в массив или нужный формат для бэкенда
   const resultData = {
     answers: Object.entries(answers.value).map(([id, value]) => ({
       question_id: parseInt(id),
-      answer: value // Ключ теперь "answer", как в вашем примере
+      answer: value
     }))
   };
   console.log(resultData)
