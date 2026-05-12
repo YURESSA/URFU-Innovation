@@ -63,3 +63,20 @@ class UserManager:
 
             session.commit()
             return user_test.user_test_id
+
+    def get_users_for_bitrix_export(self, only_new: bool = False):
+        with self.session_factory() as session:
+            query = select(User).order_by(User.user_id.asc())
+            if only_new:
+                query = query.where(User.bitrix_exported.is_(False))
+            return session.scalars(query).all()
+
+    def mark_users_as_bitrix_exported(self, user_ids: list[int]):
+        if not user_ids:
+            return
+
+        with self.session_factory() as session:
+            users = session.scalars(select(User).where(User.user_id.in_(user_ids))).all()
+            for user in users:
+                user.bitrix_exported = True
+            session.commit()

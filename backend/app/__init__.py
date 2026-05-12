@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from .config import Config
-from .database import Base, engine
+from .database import Base, engine, ensure_schema
 from .routes import register_routes
 
 
@@ -12,6 +12,7 @@ def create_app():
 
     # Создание таблиц
     Base.metadata.create_all(bind=engine)
+    ensure_schema()
 
     # Регистрация маршрутов
     register_routes(app)

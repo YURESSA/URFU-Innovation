@@ -84,6 +84,37 @@ def save_and_send_file(wb):
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
+def send_workbook(wb, download_name: str):
+    file_stream = BytesIO()
+    wb.save(file_stream)
+    file_stream.seek(0)
+    return send_file(
+        file_stream,
+        as_attachment=True,
+        download_name=download_name,
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+
+def create_bitrix_users_excel(users: list):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Bitrix users"
+
+    ws.append(["ФИО", "Номер телефона", "Telegram ID"])
+
+    for user in users:
+        ws.append([
+            user.full_name,
+            str(user.phone_number),
+            user.telegram_id
+        ])
+
+    format_phone_numbers(ws)
+    adjust_column_widths(ws)
+    return wb, ws
+
+
 def create_disc_excel_file(data: list):
     """
     data: список словарей с ключами:

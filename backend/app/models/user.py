@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -13,6 +13,7 @@ class User(Base):
     phone_number = Column(String, nullable=False)
     telegram_id = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
+    bitrix_exported = Column(Boolean, nullable=False, default=False, server_default="0")
 
     tests = relationship("UserTest", back_populates="user")
 

@@ -1,9 +1,12 @@
 from flask import Blueprint, request, session, jsonify
 from ..controllers.AdminManager import AdminManager
+from ..controllers.UserManager import UserManager
 from ..database import SessionLocal
+from ..services.excel_service import create_bitrix_users_excel, send_workbook
 
 admin_bp = Blueprint('admin', __name__)
 admin_manager = AdminManager(session_factory=SessionLocal)
+user_manager = UserManager(session_factory=SessionLocal)
 
 @admin_bp.route('/login', methods=['POST'])
 def login():
@@ -84,3 +87,34 @@ def promote_to_super_admin():
     return jsonify({"success": is_success, "message": message}), code
 
 
+def _export_bitrix_users(only_new: bool, download_name: str):
+    current_user = session.get('admin_username')
+    if not current_user:
+        return jsonify({"success": False, "message": "Пользователь не авторизован!"}), 401
+
+    if not admin_manager.is_admin(current_user):
+        return jsonify({"success": False, "message": "Только администраторы могут выполнять данное действие!"}), 403
+
+    users = user_manager.get_users_for_bitrix_export(only_new=only_new)
+    wb, _ = create_bitrix_users_excel(users)
+
+    user_ids = [user.user_id for user in users]
+    user_manager.mark_users_as_bitrix_exported(user_ids)
+
+    return send_workbook(wb, download_name)
+
+
+@admin_bp.route('/bitrix/users/export-all', methods=['GET'])
+def export_all_users_for_bitrix():
+    return _export_bitrix_users(
+        only_new=False,
+        download_name='bitrix_users_all.xlsx'
+    )
+
+
+@admin_bp.route('/bitrix/users/export-new', methods=['GET'])
+def export_new_users_for_bitrix():
+    return _export_bitrix_users(
+        only_new=True,
+        download_name='bitrix_users_new.xlsx'
+    )
