@@ -5,10 +5,11 @@ services:
     build:
       context: ./backend
     container_name: urfu-backend
+    restart: unless-stopped
     ports:
       - "5000:5000"
     volumes:
-      - ./backend/data/innovate.db3:/app/data/innovate.db3
+      - ./backend/app/data/innovate.db3:/app/app/data/innovate.db3
     env_file:
       - backend/app/.env
 
@@ -16,6 +17,7 @@ services:
     build:
       context: ./frontend/frontend-vue
     container_name: urfu-frontend
+    restart: unless-stopped
     ports:
       - "80:80"
     depends_on:
