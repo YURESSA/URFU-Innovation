@@ -1,6 +1,8 @@
 <template>
   <header>
     <div class="interaction">
+      <button @click="exportAll">Выгрузить всех пользователей</button>
+      <button @click="exportNew">Выгрузить новых пользователей</button>
       <button @click="emit('openForm')">Добавить нового администратора</button>
       <button @click="emit('openList')">Список администраторов</button>
       <button @click="logout" class="icon-btn"><img src="@public/assets/admin/exit-svg.svg">Выйти</button>
@@ -25,6 +27,40 @@ const logout = () =>{
   .then(response => {
     router.push('/admin');
   })
+}
+
+const exportAll = () => {
+  axios.get(`${baseUrl}/bitrix/users/export-all`, {
+    responseType: 'blob',
+    withCredentials: true
+  })
+  .then(response => {
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'all_users.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  })
+  .catch(error => console.error('Ошибка экспорта всех пользователей:', error));
+}
+
+const exportNew = () => {
+  axios.get(`${baseUrl}/bitrix/users/export-new`, {
+    responseType: 'blob',
+    withCredentials: true
+  })
+  .then(response => {
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'new_users.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  })
+  .catch(error => console.error('Ошибка экспорта новых пользователей:', error));
 }
 </script>
 
