@@ -8,7 +8,7 @@
           </div>
           <div class="logo">
             <img src="@public/assets/belbin/line1.svg" class="line1" alt="">
-            <a href="/"><img src="@public/assets/main-page/logo.svg" class="urfu" alt=""></a>
+            <!-- <a href="/"><img src="@public/assets/main-page/logo.svg" class="urfu" alt=""></a> -->
             <img src="@public/assets/belbin/line2.svg" class="line2" alt="">
           </div>
         </div>

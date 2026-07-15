@@ -4,7 +4,7 @@
       <header>
         <div class="header__wrapper">
           <div class="logo order-1">
-            <router-link to="/"><img src="@public/assets/main-page/logo.svg" alt=""></router-link>
+            <!-- <router-link to="/"><img src="@public/assets/main-page/logo.svg" alt=""></router-link> -->
           </div>
           
           <div class="title order-3">
@@ -62,7 +62,7 @@
           
           <div v-else class="empty-state">
             <p>Вы еще не прошли ни одного теста.</p>
-            <router-link to="/tests" class="btn-primary">Найти тесты</router-link>
+            <router-link to="/" class="btn-primary">Найти тесты</router-link>
           </div>
         </section>
       </main>
